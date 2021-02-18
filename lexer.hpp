@@ -1,6 +1,9 @@
+#ifndef LEXER_HPP
+#define LEXER_HPP
 #include <fstream>
 #include <string>
 #include <vector>
+#include "token.hpp"
 
 class Lexer {
 private:
@@ -15,4 +18,7 @@ public:
         inputStream.close();
     }
 
+    std::vector<Token> analyze();
 };
+
+#endif
