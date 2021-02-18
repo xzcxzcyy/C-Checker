@@ -14,5 +14,5 @@ public:
     ~Lexer() {
         inputStream.close();
     }
-    
+
 };
