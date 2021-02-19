@@ -201,6 +201,40 @@ void Lexer::analyze() {
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
                 panic(loopFlag, word, state);
             }
+            break;
+
+        case 8:
+            if (isDigit(ch)) {
+                word.push_back(ch);
+            } else {
+                inputStream.unget();
+                tokens.emplace_back(word, Token::CONST_FLOAT);
+                word.clear();
+                state = 0;
+            }
+            break;
+
+        case 9:
+            if (isDigit(ch)) {
+                word.push_back(ch);
+                state = 3;
+            } else if (ch == '.') {
+                word.push_back(ch);
+                state = 6;
+            } else if (ch == 'e' || ch == 'E') {
+                word.push_back(ch);
+                state = 7;
+            } else {
+                if (ch == 'L') {
+                    word.push_back(ch);
+                    tokens.emplace_back(word, Token::CONST_LONG);
+                } else {
+                    inputStream.unget();
+                    tokens.emplace_back(word, Token::CONST_INT);
+                }
+                word.clear();
+                state = 0;
+            }
         }
     }
 }
