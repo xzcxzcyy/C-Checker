@@ -180,7 +180,17 @@ void Lexer::analyze() {
             break;
 
         case 6:
-            
+            if (isDigit(ch)) {
+                word.push_back(ch);
+            } else if (ch == 'e' || ch == 'E') {
+                word.push_back(ch);
+                state = 7;
+            } else {
+                inputStream.unget();
+                tokens.emplace_back(word, Token::CONST_FLOAT);
+                word.clear();
+                state = 0;
+            }
         }
     }
 }
