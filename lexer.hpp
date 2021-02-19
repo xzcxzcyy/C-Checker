@@ -20,6 +20,7 @@ private:
     bool isLetter(char c);
     bool isEof(char c);
     bool isWhiteSpace(char c);
+    bool isHexadecimal(char c);
     void inflateKeywords();
     void panic(bool& loopFlag);
 

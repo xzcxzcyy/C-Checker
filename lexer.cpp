@@ -129,7 +129,39 @@ void Lexer::analyze() {
             break;
 
         case 3:
-            
+            if (isDigit(ch)) {
+                word.push_back(ch);
+            } else if (ch == '.') {
+                word.push_back(ch);
+                state = 6;
+            } else if (ch == 'e' || ch == 'E') {
+                word.push_back(ch);
+                state = 7;
+            } else {
+                if (ch == 'L') {
+                    word.push_back(ch);
+                    tokens.emplace_back(word, Token::CONST_LONG);
+                } else {
+                    inputStream.unget();
+                    tokens.emplace_back(word, Token::CONST_INT);
+                }
+                word.clear();
+                state = 0;
+            }
+            break;
+
+        case 4:
+            if (isHexadecimal(ch)) {
+                word.push_back(ch);
+                state = 5;
+            } else {
+                std::string errorMsg = "Lexical error: illegal hex number at line ";
+                errorMsg.append(std::to_string(line));
+                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                errorCount++;
+                panic(loopFlag);
+            }
+            break;
         }
     }
 }
@@ -152,6 +184,10 @@ bool Lexer::isEof(char c) {
 
 bool Lexer::isWhiteSpace(char c) {
     return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+}
+
+bool Lexer::isHexadecimal(char c) {
+    return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 }
 
 void Lexer::inflateKeywords() {
