@@ -22,7 +22,7 @@ private:
     bool isWhiteSpace(char c);
     bool isHexadecimal(char c);
     void inflateKeywords();
-    void panic(bool& loopFlag);
+    void panic(bool& loopFlag, std::string& word, int& state);
 
 public:
     Lexer(std::string fileName, int startLine) {

@@ -82,8 +82,7 @@ void Lexer::analyze() {
                 std::string errorMsg = "Lexical error: illegal character at line ";
                 errorMsg.append(std::to_string(line));
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                errorCount++;
-                panic(loopFlag);
+                panic(loopFlag, word, state);
             }
             break;
 
@@ -158,8 +157,7 @@ void Lexer::analyze() {
                 std::string errorMsg = "Lexical error: illegal hex number at line ";
                 errorMsg.append(std::to_string(line));
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                errorCount++;
-                panic(loopFlag);
+                panic(loopFlag, word, state);
             }
             break;
 
@@ -190,6 +188,18 @@ void Lexer::analyze() {
                 tokens.emplace_back(word, Token::CONST_FLOAT);
                 word.clear();
                 state = 0;
+            }
+            break;
+
+        case 7:
+            if (isDigit(ch)) {
+                word.push_back(ch);
+                state = 8;
+            } else {
+                std::string errorMsg = "Lexical error: illegal exp number at line ";
+                errorMsg.append(std::to_string(line));
+                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                panic(loopFlag, word, state);
             }
         }
     }
@@ -237,7 +247,12 @@ void Lexer::inflateKeywords() {
     keywords["return"] = Token::RETURN;
 }
 
-void Lexer::panic(bool& loopFlag) {
+void Lexer::panic(bool& loopFlag, std::string& word, int& state) {
+    inputStream.unget();
+    word.clear();
+    state = 0;
+    errorCount++;
+    
     char pch;
     while (loopFlag) {
         if (pch == '\n') {
