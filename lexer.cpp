@@ -103,6 +103,32 @@ void Lexer::analyze() {
             break;
 
         case 2:
+            if (isDigit(ch)) {
+                word.push_back(ch);
+                state = 3;
+            } else if (ch == 'x' || ch == 'X') {
+                word.push_back(ch);
+                state = 4;
+            } else if (ch == '.') {
+                word.push_back(ch);
+                state = 6;
+            } else if (ch == 'e' || ch == 'E') {
+                word.push_back(ch);
+                state = 7;
+            } else {
+                if (ch == 'L') {
+                    word.push_back(ch);
+                    tokens.emplace_back(word, Token::CONST_LONG);
+                } else {
+                    inputStream.unget();
+                    tokens.emplace_back(word, Token::CONST_INT);
+                }
+                word.clear();
+                state = 0;
+            }
+            break;
+
+        case 3:
             
         }
     }
