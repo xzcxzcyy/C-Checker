@@ -162,6 +162,25 @@ void Lexer::analyze() {
                 panic(loopFlag);
             }
             break;
+
+        case 5:
+            if (isHexadecimal(ch)) {
+                word.push_back(ch);
+            } else {
+                if (ch == 'L') {
+                    word.push_back(ch);
+                    tokens.emplace_back(word, Token::CONST_LONG);
+                } else {
+                    inputStream.unget();
+                    tokens.emplace_back(word, Token::CONST_INT);
+                }
+                word.clear();
+                state = 0;
+            }
+            break;
+
+        case 6:
+            
         }
     }
 }
