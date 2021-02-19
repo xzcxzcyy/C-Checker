@@ -36,6 +36,7 @@ public:
         MINUS,
         TIMES,
         DIVIDE,
+        MOD,
         GREATER,
         GEQUAL,
         LESS,

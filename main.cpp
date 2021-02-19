@@ -4,7 +4,7 @@
 using namespace std;
 
 int main() {
-    auto a = 0e4;
+    auto a = '\a';
     std::cout << a << std::endl;
     return 0;
 }
