@@ -5,6 +5,7 @@
 class Token {
 public:
     enum TokenType {
+        ERROR_TOKEN,
         VOID,
         INT,
         CHAR,
@@ -47,6 +48,7 @@ public:
         COMMA,
         WHITESPACE,
         ASSIGN,
+        COMMENTS,
     };
     TokenType type;
     std::string name;

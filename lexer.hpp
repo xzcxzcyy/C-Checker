@@ -8,17 +8,19 @@
 class Lexer {
 private:
     std::ifstream inputStream;
+    std::vector<Token> tokens;
 
 public:
     Lexer(std::string fileName) {
         inputStream = std::ifstream(fileName);
+        tokens.clear();
     }
 
     ~Lexer() {
         inputStream.close();
     }
 
-    std::vector<Token> analyze();
+    void analyze();
 };
 
 #endif

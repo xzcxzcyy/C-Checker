@@ -4,6 +4,7 @@
 using namespace std;
 
 int main() {
-    std::cout << "hello world" << std::endl;
+    auto a = 0e4;
+    std::cout << a << std::endl;
     return 0;
 }
