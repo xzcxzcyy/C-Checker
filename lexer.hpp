@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <unordered_set>
+#include <unordered_map>
 #include "token.hpp"
 
 class Lexer {
@@ -11,7 +11,7 @@ private:
     std::string fileName;
     std::ifstream inputStream;
     std::vector<Token> tokens;
-    std::unordered_set<std::string> keywordSet;
+    std::unordered_map<std::string, Token::TokenType> keywords;
     int startLine;
     int errorCount;
 
@@ -20,6 +20,7 @@ private:
     bool isLetter(char c);
     bool isEof(char c);
     bool isWhiteSpace(char c);
+    void inflateKeywords();
     void panic(bool& loopFlag);
 
 public:
@@ -27,7 +28,7 @@ public:
         this->fileName = fileName;
         inputStream = std::ifstream(fileName);
         tokens.clear();
-        keywordSet = { "int" }; // TODO: inflate keywordSet at here
+        inflateKeywords();
         this->startLine = startLine;
         errorCount = 0;
     }

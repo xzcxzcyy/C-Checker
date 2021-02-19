@@ -88,6 +88,21 @@ void Lexer::analyze() {
             break;
 
         case 1:
+            if (isUnderscore(ch) || isLetter(ch) || isDigit(ch)) {
+                word.push_back(ch);
+            } else {
+                inputStream.unget();
+                if (keywords.count(word)) {
+                    tokens.emplace_back(word, keywords[word]);
+                } else {
+                    tokens.emplace_back(word, Token::IDENTIFIER);
+                }
+                word.clear();
+                state = 0;
+            }
+            break;
+
+        case 2:
             
         }
     }
@@ -111,6 +126,24 @@ bool Lexer::isEof(char c) {
 
 bool Lexer::isWhiteSpace(char c) {
     return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+}
+
+void Lexer::inflateKeywords() {
+    keywords["void"] = Token::VOID;
+    keywords["int"] = Token::INT;
+    keywords["char"] = Token::CHAR;
+    keywords["short"] = Token::SHORT;
+    keywords["long"] = Token::LONG;
+    keywords["double"] = Token::DOUBLE;
+    keywords["float"] = Token::FLOAT;
+    keywords["const"] = Token::CONST;
+    keywords["while"] = Token::WHILE;
+    keywords["for"] = Token::FOR;
+    keywords["continue"] = Token::CONTINUE;
+    keywords["break"] = Token::BREAK;
+    keywords["if"] = Token::IF;
+    keywords["else"] = Token::ELSE;
+    keywords["return"] = Token::RETURN;
 }
 
 void Lexer::panic(bool& loopFlag) {
