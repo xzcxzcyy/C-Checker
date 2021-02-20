@@ -235,6 +235,62 @@ void Lexer::analyze() {
                 word.clear();
                 state = 0;
             }
+            break;
+
+        case 10:
+            if (isDigit(ch)) {
+                word.push_back(ch);
+                state = 6;
+            } else {
+                std::string errorMsg = "Lexical error: illegal floating number at line ";
+                errorMsg.append(std::to_string(line));
+                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                panic(loopFlag, word, state);
+            }
+            break;
+
+        case 11:
+            if (ch == '\\') {
+                word.push_back(ch);
+                state = 12;
+            } else {
+                if (ch == '\n' || ch == EOF) {
+                    std::string errorMsg = "Lexical error: illegal constant of char at line ";
+                    errorMsg.append(std::to_string(line));
+                    tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                    panic(loopFlag, word, state);
+                } else {
+                    word.push_back(ch);
+                    state = 13;
+                }
+            }
+            break;
+
+        case 12:
+            if (ch == '\n' || ch == EOF) {
+                std::string errorMsg = "Lexical error: illegal constant of char at line ";
+                errorMsg.append(std::to_string(line));
+                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                panic(loopFlag, word, state);
+            } else {
+                word.push_back(ch);
+                state = 13;
+            }
+            break;
+
+        case 13:
+            if (ch == '\'') {
+                word.push_back(ch);
+                tokens.emplace_back(word, Token::CONST_CHAR);
+                word.clear();
+                state = 0;
+            } else {
+                std::string errorMsg = "Lexical error: illegal constant of char at line ";
+                errorMsg.append(std::to_string(line));
+                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                panic(loopFlag, word, state);
+            }
+            break;
         }
     }
 }
@@ -286,7 +342,7 @@ void Lexer::panic(bool& loopFlag, std::string& word, int& state) {
     word.clear();
     state = 0;
     errorCount++;
-    
+
     char pch;
     while (loopFlag) {
         if (pch == '\n') {
