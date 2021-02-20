@@ -1,8 +1,10 @@
+#include <fstream>
 #include <vector>
 #include "token.hpp"
 #include "lexer.hpp"
 
 void Lexer::analyze() {
+    auto inputStream = std::ifstream(fileName);
     tokens.clear();
     int state = 0;
     int line = 1;
@@ -83,7 +85,7 @@ void Lexer::analyze() {
                 std::string errorMsg = "Lexical error: illegal character at line ";
                 errorMsg.append(std::to_string(line));
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             }
             break;
 
@@ -158,7 +160,7 @@ void Lexer::analyze() {
                 std::string errorMsg = "Lexical error: illegal hex number at line ";
                 errorMsg.append(std::to_string(line));
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             }
             break;
 
@@ -200,7 +202,7 @@ void Lexer::analyze() {
                 std::string errorMsg = "Lexical error: illegal exp number at line ";
                 errorMsg.append(std::to_string(line));
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             }
             break;
 
@@ -246,7 +248,7 @@ void Lexer::analyze() {
                 std::string errorMsg = "Lexical error: illegal floating number at line ";
                 errorMsg.append(std::to_string(line));
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             }
             break;
 
@@ -259,7 +261,7 @@ void Lexer::analyze() {
                     std::string errorMsg = "Lexical error: illegal constant of char at line ";
                     errorMsg.append(std::to_string(line));
                     tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                    panic(loopFlag, word, state);
+                    panic(inputStream, loopFlag, word, state);
                 } else {
                     word.push_back(ch);
                     state = 13;
@@ -272,7 +274,7 @@ void Lexer::analyze() {
                 std::string errorMsg = "Lexical error: illegal constant of char at line ";
                 errorMsg.append(std::to_string(line));
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             } else {
                 word.push_back(ch);
                 state = 13;
@@ -289,7 +291,7 @@ void Lexer::analyze() {
                 std::string errorMsg = "Lexical error: illegal constant of char at line ";
                 errorMsg.append(std::to_string(line));
                 tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             }
             break;
 
@@ -344,7 +346,7 @@ void Lexer::analyze() {
             } else {
                 std::string errorMsg = "Lexical error: illegal operator at line ";
                 errorMsg.append(std::to_string(line));
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             }
             break;
 
@@ -357,7 +359,7 @@ void Lexer::analyze() {
             } else {
                 std::string errorMsg = "Lexical error: illegal operator at line ";
                 errorMsg.append(std::to_string(line));
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             }
             break;
 
@@ -370,7 +372,7 @@ void Lexer::analyze() {
             } else {
                 std::string errorMsg = "Lexical error: illegal operator at line ";
                 errorMsg.append(std::to_string(line));
-                panic(loopFlag, word, state);
+                panic(inputStream, loopFlag, word, state);
             }
             break;
 
@@ -378,6 +380,7 @@ void Lexer::analyze() {
             throw "ILLEGAL_LEXER_STATE_EXP";
         }
     }
+    inputStream.close();
 }
 
 bool Lexer::isUnderscore(char c) {
@@ -422,7 +425,7 @@ void Lexer::inflateKeywords() {
     keywords["return"] = Token::RETURN;
 }
 
-void Lexer::panic(bool& loopFlag, std::string& word, int& state) {
+void Lexer::panic(std::ifstream& inputStream, bool& loopFlag, std::string& word, int& state) {
     inputStream.unget();
     word.clear();
     state = 0;
@@ -430,6 +433,7 @@ void Lexer::panic(bool& loopFlag, std::string& word, int& state) {
 
     char pch;
     while (loopFlag) {
+        pch = inputStream.get();
         if (pch == '\n') {
             inputStream.unget();
             break;

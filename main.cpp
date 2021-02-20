@@ -4,7 +4,13 @@
 using namespace std;
 
 int main() {
-    auto a = 0xaL;
-    std::cout << a << std::endl;
+    auto lexer = Lexer("test.c", 1);
+    lexer.analyze();
+    auto tokens = lexer.getTokens();
+    
+    for (const auto& token : tokens) {
+        cout << token.name << endl;
+    }
+
     return 0;
 }
