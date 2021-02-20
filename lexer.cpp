@@ -292,6 +292,90 @@ void Lexer::analyze() {
                 panic(loopFlag, word, state);
             }
             break;
+
+        case 14:
+            if (ch == '=') {
+                word.push_back(ch);
+                tokens.emplace_back(word, Token::GEQUAL);
+                word.clear();
+                state = 0;
+            } else {
+                inputStream.unget();
+                tokens.emplace_back(word, Token::GREATER);
+                word.clear();
+                state = 0;
+            }
+            break;
+
+        case 15:
+            if (ch == '=') {
+                word.push_back(ch);
+                tokens.emplace_back(word, Token::LEQUAL);
+                word.clear();
+                state = 0;
+            } else {
+                inputStream.unget();
+                tokens.emplace_back(word, Token::LESS);
+                word.clear();
+                state = 0;
+            }
+            break;
+
+        case 16:
+            if (ch == '=') {
+                word.push_back(ch);
+                tokens.emplace_back(word, Token::EQUAL);
+                word.clear();
+                state = 0;
+            } else {
+                inputStream.unget();
+                tokens.emplace_back(word, Token::ASSIGN);
+                word.clear();
+                state = 0;
+            }
+            break;
+
+        case 17:
+            if (ch == '=') {
+                word.push_back(ch);
+                tokens.emplace_back(word, Token::NOT_EQUAL);
+                word.clear();
+                state = 0;
+            } else {
+                std::string errorMsg = "Lexical error: illegal operator at line ";
+                errorMsg.append(std::to_string(line));
+                panic(loopFlag, word, state);
+            }
+            break;
+
+        case 18:
+            if (ch == '&') {
+                word.push_back(ch);
+                tokens.emplace_back(word, Token::LOGICAL_AND);
+                word.clear();
+                state = 0;
+            } else {
+                std::string errorMsg = "Lexical error: illegal operator at line ";
+                errorMsg.append(std::to_string(line));
+                panic(loopFlag, word, state);
+            }
+            break;
+
+        case 19:
+            if (ch == '|') {
+                word.push_back(ch);
+                tokens.emplace_back(word, Token::LOGICAL_OR);
+                word.clear();
+                state = 0;
+            } else {
+                std::string errorMsg = "Lexical error: illegal operator at line ";
+                errorMsg.append(std::to_string(line));
+                panic(loopFlag, word, state);
+            }
+            break;
+
+        default:
+            throw "ILLEGAL_LEXER_STATE_EXP";
         }
     }
 }
