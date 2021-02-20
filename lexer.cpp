@@ -55,6 +55,7 @@ void Lexer::analyze() {
             } else if (isWhiteSpace(ch)) {
                 if (ch == '\n') {
                     line++;
+                    tokens.emplace_back("\n", Token::WHITESPACE);
                 }
             } else if (ch == '%') {
                 tokens.emplace_back("%", Token::MOD);
