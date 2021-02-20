@@ -38,6 +38,18 @@ public:
         inputStream.close();
     }
 
+    std::vector<Token>& getTokens() {
+        return tokens;
+    }
+
+    int getStartLine() {
+        return startLine;
+    }
+
+    int getErrorCount() {
+        return errorCount;
+    }
+
     void analyze();
 };
 
