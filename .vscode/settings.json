@@ -7,7 +7,8 @@
     "C_Cpp.formatting": "vcFormat",
     "files.associations": {
         "*.tcc": "cpp",
-        "istream": "cpp"
+        "istream": "cpp",
+        "iostream": "cpp"
     },
     "C_Cpp.vcFormat.newLine.beforeElse": false,
     "C_Cpp.vcFormat.newLine.beforeCatch": false

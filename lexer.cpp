@@ -1,5 +1,6 @@
 #include <fstream>
 #include <vector>
+#include <string>
 #include "token.hpp"
 #include "lexer.hpp"
 
@@ -441,5 +442,61 @@ void Lexer::panic(std::ifstream& inputStream, bool& loopFlag, std::string& word,
             loopFlag = false;
             break;
         }
+    }
+}
+
+void Lexer::displayTokens(std::ostream& out) {
+    static const std::vector<std::string> tokenClassNames = {
+            "ERROR_TOKEN",
+            "VOID",
+            "INT",
+            "CHAR",
+            "SHORT",
+            "LONG",
+            "DOUBLE",
+            "FLOAT",
+            "CONST",
+            "WHILE",
+            "FOR",
+            "CONTINUE",
+            "BREAK",
+            "IF",
+            "ELSE",
+            "RETURN",
+            "IDENTIFIER",
+            "CONST_INT",
+            "CONST_LONG",
+            "CONST_FLOAT",
+            "CONST_CHAR",
+            "OPEN_PAREN",
+            "CLOSE_PAREN",
+            "OPEN_BRACKET",
+            "CLOSE_BRACKET",
+            "OPEN_BRACE",
+            "CLOSE_BRACE",
+            "PLUS",
+            "MINUS",
+            "TIMES",
+            "DIVIDE",
+            "MOD",
+            "GREATER",
+            "GEQUAL",
+            "LESS",
+            "LEQUAL",
+            "EQUAL",
+            "NOT_EQUAL",
+            "LOGICAL_AND",
+            "LOGICAL_OR",
+            "SEMICOL",
+            "COMMA",
+            "WHITESPACE",
+            "ASSIGN",
+            "COMMENTS"
+    };
+    for (const auto& token : tokens) {
+        if (token.type == Token::WHITESPACE) {
+            continue;
+        }
+        out << tokenClassNames[token.type] + "\t" + token.name << std::endl;
     }
 }

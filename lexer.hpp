@@ -53,6 +53,7 @@ public:
     }
 
     void analyze();
+    void displayTokens(std::ostream& out);
 };
 
 #endif
