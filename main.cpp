@@ -4,8 +4,8 @@
 using namespace std;
 
 int main() {
-    auto lexer = Lexer("test.c", 1);
+    auto lexer = Lexer("test/test.in", 1);
     lexer.analyze();
-    lexer.displayTokens(cout);
+    lexer.displayTokens(cout, true);
     return 0;
 }

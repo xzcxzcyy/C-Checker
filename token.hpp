@@ -58,6 +58,10 @@ public:
         this->name = name;
         this->type = type;
     }
+
+    bool operator<(const Token& another) {
+        return this->type < another.type;
+    }
 };
 
 #endif

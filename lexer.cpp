@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "token.hpp"
 #include "lexer.hpp"
 
@@ -445,7 +446,7 @@ void Lexer::panic(std::ifstream& inputStream, bool& loopFlag, std::string& word,
     }
 }
 
-void Lexer::displayTokens(std::ostream& out) {
+void Lexer::displayTokens(std::ostream& out, bool sortThem) {
     static const std::vector<std::string> tokenClassNames = {
             "ERROR_TOKEN",
             "VOID",
@@ -493,7 +494,11 @@ void Lexer::displayTokens(std::ostream& out) {
             "ASSIGN",
             "COMMENTS"
     };
-    for (const auto& token : tokens) {
+    auto toDisplayTokens = tokens;
+    if (sortThem) {
+        std::sort(toDisplayTokens.begin(), toDisplayTokens.end());
+    }
+    for (const auto& token : toDisplayTokens) {
         if (token.type == Token::WHITESPACE) {
             continue;
         }

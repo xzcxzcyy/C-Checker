@@ -53,7 +53,7 @@ public:
     }
 
     void analyze();
-    void displayTokens(std::ostream& out);
+    void displayTokens(std::ostream& out, bool sortThem);
 };
 
 #endif
