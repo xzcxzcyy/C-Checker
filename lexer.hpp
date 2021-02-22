@@ -12,8 +12,8 @@ private:
     // std::ifstream inputStream;
     std::vector<Token> tokens;
     std::unordered_map<std::string, Token::TokenType> keywords;
-    int startLine;
     int errorCount;
+    int line = 1;
 
     bool isUnderscore(char c);
     bool isDigit(char c);
@@ -23,29 +23,18 @@ private:
     bool isHexadecimal(char c);
     void inflateKeywords();
     void panic(std::ifstream& inputStream, bool& loopFlag, std::string& word, int& state);
+    Token makeToken(std::string name, Token::TokenType type);
 
 public:
-    Lexer(std::string fileName, int startLine) {
+    Lexer(std::string fileName) {
         this->fileName = fileName;
-        // inputStream = std::ifstream(fileName);
         tokens.clear();
         inflateKeywords();
-        this->startLine = startLine;
         errorCount = 0;
     }
 
-    /*
-    ~Lexer() {
-        inputStream.close();
-    }
-    */
-
     std::vector<Token>& getTokens() {
         return tokens;
-    }
-
-    int getStartLine() {
-        return startLine;
     }
 
     int getErrorCount() {

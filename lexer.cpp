@@ -6,10 +6,10 @@
 #include "lexer.hpp"
 
 void Lexer::analyze() {
+    line = 1;
     auto inputStream = std::ifstream(fileName);
     tokens.clear();
     int state = 0;
-    int line = 1;
     char ch;
     bool loopFlag = true;
     std::string word;
@@ -33,36 +33,36 @@ void Lexer::analyze() {
                 word.push_back(ch);
                 state = 11;
             } else if (ch == '(') {
-                tokens.emplace_back("(", Token::OPEN_PAREN);
+                tokens.push_back(makeToken("(", Token::OPEN_PAREN));
             } else if (ch == ')') {
-                tokens.emplace_back(")", Token::CLOSE_PAREN);
+                tokens.push_back(makeToken(")", Token::CLOSE_PAREN));
             } else if (ch == '[') {
-                tokens.emplace_back("[", Token::OPEN_BRACKET);
+                tokens.push_back(makeToken("[", Token::OPEN_BRACKET));
             } else if (ch == ']') {
-                tokens.emplace_back("]", Token::CLOSE_BRACKET);
+                tokens.push_back(makeToken("]", Token::CLOSE_BRACKET));
             } else if (ch == '{') {
-                tokens.emplace_back("{", Token::OPEN_BRACE);
+                tokens.push_back(makeToken("{", Token::OPEN_BRACE));
             } else if (ch == '}') {
-                tokens.emplace_back("}", Token::CLOSE_BRACE);
+                tokens.push_back(makeToken("}", Token::CLOSE_BRACE));
             } else if (ch == '+') {
-                tokens.emplace_back("+", Token::PLUS);
+                tokens.push_back(makeToken("+", Token::PLUS));
             } else if (ch == '-') {
-                tokens.emplace_back("-", Token::MINUS);
+                tokens.push_back(makeToken("-", Token::MINUS));
             } else if (ch == '*') {
-                tokens.emplace_back("*", Token::TIMES);
+                tokens.push_back(makeToken("*", Token::TIMES));
             } else if (ch == '/') {
-                tokens.emplace_back("/", Token::DIVIDE);
+                tokens.push_back(makeToken("/", Token::DIVIDE));
             } else if (ch == ';') {
-                tokens.emplace_back(";", Token::SEMICOL);
+                tokens.push_back(makeToken(";", Token::SEMICOL));
             } else if (ch == ',') {
-                tokens.emplace_back(",", Token::COMMA);
+                tokens.push_back(makeToken(",", Token::COMMA));
             } else if (isWhiteSpace(ch)) {
                 if (ch == '\n') {
                     line++;
-                    tokens.emplace_back("\n", Token::WHITESPACE);
+                    // tokens.push_back(makeToken("\n", Token::WHITESPACE));
                 }
             } else if (ch == '%') {
-                tokens.emplace_back("%", Token::MOD);
+                tokens.push_back(makeToken("%", Token::MOD));
             } else if (ch == '>') {
                 word.push_back(ch);
                 state = 14;
@@ -86,7 +86,7 @@ void Lexer::analyze() {
             } else {
                 std::string errorMsg = "Lexical error: illegal character at line ";
                 errorMsg.append(std::to_string(line));
-                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
                 panic(inputStream, loopFlag, word, state);
             }
             break;
@@ -97,9 +97,9 @@ void Lexer::analyze() {
             } else {
                 inputStream.unget();
                 if (keywords.count(word)) {
-                    tokens.emplace_back(word, keywords[word]);
+                    tokens.push_back(makeToken(word, keywords[word]));
                 } else {
-                    tokens.emplace_back(word, Token::IDENTIFIER);
+                    tokens.push_back(makeToken(word, Token::IDENTIFIER));
                 }
                 word.clear();
                 state = 0;
@@ -122,10 +122,10 @@ void Lexer::analyze() {
             } else {
                 if (ch == 'L') {
                     word.push_back(ch);
-                    tokens.emplace_back(word, Token::CONST_LONG);
+                    tokens.push_back(makeToken(word, Token::CONST_LONG));
                 } else {
                     inputStream.unget();
-                    tokens.emplace_back(word, Token::CONST_INT);
+                    tokens.push_back(makeToken(word, Token::CONST_INT));
                 }
                 word.clear();
                 state = 0;
@@ -144,10 +144,10 @@ void Lexer::analyze() {
             } else {
                 if (ch == 'L') {
                     word.push_back(ch);
-                    tokens.emplace_back(word, Token::CONST_LONG);
+                    tokens.push_back(makeToken(word, Token::CONST_LONG));
                 } else {
                     inputStream.unget();
-                    tokens.emplace_back(word, Token::CONST_INT);
+                    tokens.push_back(makeToken(word, Token::CONST_INT));
                 }
                 word.clear();
                 state = 0;
@@ -161,7 +161,7 @@ void Lexer::analyze() {
             } else {
                 std::string errorMsg = "Lexical error: illegal hex number at line ";
                 errorMsg.append(std::to_string(line));
-                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
                 panic(inputStream, loopFlag, word, state);
             }
             break;
@@ -172,10 +172,10 @@ void Lexer::analyze() {
             } else {
                 if (ch == 'L') {
                     word.push_back(ch);
-                    tokens.emplace_back(word, Token::CONST_LONG);
+                    tokens.push_back(makeToken(word, Token::CONST_LONG));
                 } else {
                     inputStream.unget();
-                    tokens.emplace_back(word, Token::CONST_INT);
+                    tokens.push_back(makeToken(word, Token::CONST_INT));
                 }
                 word.clear();
                 state = 0;
@@ -190,7 +190,7 @@ void Lexer::analyze() {
                 state = 7;
             } else {
                 inputStream.unget();
-                tokens.emplace_back(word, Token::CONST_FLOAT);
+                tokens.push_back(makeToken(word, Token::CONST_FLOAT));
                 word.clear();
                 state = 0;
             }
@@ -203,7 +203,7 @@ void Lexer::analyze() {
             } else {
                 std::string errorMsg = "Lexical error: illegal exp number at line ";
                 errorMsg.append(std::to_string(line));
-                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
                 panic(inputStream, loopFlag, word, state);
             }
             break;
@@ -213,7 +213,7 @@ void Lexer::analyze() {
                 word.push_back(ch);
             } else {
                 inputStream.unget();
-                tokens.emplace_back(word, Token::CONST_FLOAT);
+                tokens.push_back(makeToken(word, Token::CONST_FLOAT));
                 word.clear();
                 state = 0;
             }
@@ -232,10 +232,10 @@ void Lexer::analyze() {
             } else {
                 if (ch == 'L') {
                     word.push_back(ch);
-                    tokens.emplace_back(word, Token::CONST_LONG);
+                    tokens.push_back(makeToken(word, Token::CONST_LONG));
                 } else {
                     inputStream.unget();
-                    tokens.emplace_back(word, Token::CONST_INT);
+                    tokens.push_back(makeToken(word, Token::CONST_INT));
                 }
                 word.clear();
                 state = 0;
@@ -249,7 +249,7 @@ void Lexer::analyze() {
             } else {
                 std::string errorMsg = "Lexical error: illegal floating number at line ";
                 errorMsg.append(std::to_string(line));
-                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
                 panic(inputStream, loopFlag, word, state);
             }
             break;
@@ -262,7 +262,7 @@ void Lexer::analyze() {
                 if (ch == '\n' || ch == EOF) {
                     std::string errorMsg = "Lexical error: illegal constant of char at line ";
                     errorMsg.append(std::to_string(line));
-                    tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                    tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
                     panic(inputStream, loopFlag, word, state);
                 } else {
                     word.push_back(ch);
@@ -275,7 +275,7 @@ void Lexer::analyze() {
             if (ch == '\n' || ch == EOF) {
                 std::string errorMsg = "Lexical error: illegal constant of char at line ";
                 errorMsg.append(std::to_string(line));
-                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
                 panic(inputStream, loopFlag, word, state);
             } else {
                 word.push_back(ch);
@@ -286,13 +286,13 @@ void Lexer::analyze() {
         case 13:
             if (ch == '\'') {
                 word.push_back(ch);
-                tokens.emplace_back(word, Token::CONST_CHAR);
+                tokens.push_back(makeToken(word, Token::CONST_CHAR));
                 word.clear();
                 state = 0;
             } else {
                 std::string errorMsg = "Lexical error: illegal constant of char at line ";
                 errorMsg.append(std::to_string(line));
-                tokens.emplace_back(errorMsg, Token::ERROR_TOKEN);
+                tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
                 panic(inputStream, loopFlag, word, state);
             }
             break;
@@ -300,12 +300,12 @@ void Lexer::analyze() {
         case 14:
             if (ch == '=') {
                 word.push_back(ch);
-                tokens.emplace_back(word, Token::GEQUAL);
+                tokens.push_back(makeToken(word, Token::GEQUAL));
                 word.clear();
                 state = 0;
             } else {
                 inputStream.unget();
-                tokens.emplace_back(word, Token::GREATER);
+                tokens.push_back(makeToken(word, Token::GREATER));
                 word.clear();
                 state = 0;
             }
@@ -314,12 +314,12 @@ void Lexer::analyze() {
         case 15:
             if (ch == '=') {
                 word.push_back(ch);
-                tokens.emplace_back(word, Token::LEQUAL);
+                tokens.push_back(makeToken(word, Token::LEQUAL));
                 word.clear();
                 state = 0;
             } else {
                 inputStream.unget();
-                tokens.emplace_back(word, Token::LESS);
+                tokens.push_back(makeToken(word, Token::LESS));
                 word.clear();
                 state = 0;
             }
@@ -328,12 +328,12 @@ void Lexer::analyze() {
         case 16:
             if (ch == '=') {
                 word.push_back(ch);
-                tokens.emplace_back(word, Token::EQUAL);
+                tokens.push_back(makeToken(word, Token::EQUAL));
                 word.clear();
                 state = 0;
             } else {
                 inputStream.unget();
-                tokens.emplace_back(word, Token::ASSIGN);
+                tokens.push_back(makeToken(word, Token::ASSIGN));
                 word.clear();
                 state = 0;
             }
@@ -342,7 +342,7 @@ void Lexer::analyze() {
         case 17:
             if (ch == '=') {
                 word.push_back(ch);
-                tokens.emplace_back(word, Token::NOT_EQUAL);
+                tokens.push_back(makeToken(word, Token::NOT_EQUAL));
                 word.clear();
                 state = 0;
             } else {
@@ -355,7 +355,7 @@ void Lexer::analyze() {
         case 18:
             if (ch == '&') {
                 word.push_back(ch);
-                tokens.emplace_back(word, Token::LOGICAL_AND);
+                tokens.push_back(makeToken(word, Token::LOGICAL_AND));
                 word.clear();
                 state = 0;
             } else {
@@ -368,7 +368,7 @@ void Lexer::analyze() {
         case 19:
             if (ch == '|') {
                 word.push_back(ch);
-                tokens.emplace_back(word, Token::LOGICAL_OR);
+                tokens.push_back(makeToken(word, Token::LOGICAL_OR));
                 word.clear();
                 state = 0;
             } else {
@@ -446,6 +446,10 @@ void Lexer::panic(std::ifstream& inputStream, bool& loopFlag, std::string& word,
     }
 }
 
+Token Lexer::makeToken(std::string name, Token::TokenType type) {
+    return Token(name, type, fileName, line);
+}
+
 void Lexer::displayTokens(std::ostream& out, bool sortThem) {
     static const std::vector<std::string> tokenClassNames = {
             "ERROR_TOKEN",
@@ -502,6 +506,8 @@ void Lexer::displayTokens(std::ostream& out, bool sortThem) {
         if (token.type == Token::WHITESPACE) {
             continue;
         }
-        out << tokenClassNames[token.type] + "\t" + token.name << std::endl;
+        out << tokenClassNames[token.type] << "\t" << token.name
+            << "\tline " << std::to_string(token.line) << "\t" << token.fileName
+            << std::endl;
     }
 }

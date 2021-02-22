@@ -53,10 +53,14 @@ public:
     };
     TokenType type;
     std::string name;
+    std::string fileName;
+    int line;
 
-    Token(std::string name, TokenType type) {
+    Token(std::string name, TokenType type, std::string fileName, int line) {
         this->name = name;
         this->type = type;
+        this->fileName = fileName;
+        this->line = line;
     }
 
     bool operator<(const Token& another) {
