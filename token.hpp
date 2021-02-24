@@ -64,7 +64,35 @@ public:
     }
 
     bool operator<(const Token& another) {
-        return this->type < another.type;
+        if (this->type < another.type) {
+            return true;
+        }
+        if (this->type > another.type) {
+            return false;
+        }
+
+        if (this->fileName < another.fileName) {
+            return true;
+        }
+        if (this->fileName > another.fileName) {
+            return false;
+        }
+
+        if (this->line < another.line) {
+            return true;
+        }
+        if (this->line > another.line) {
+            return false;
+        }
+
+        if (this->name < another.name) {
+            return true;
+        }
+        if (this->name > another.name) {
+            return false;
+        }
+
+        return false;
     }
 };
 
