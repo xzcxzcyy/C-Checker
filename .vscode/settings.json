@@ -11,5 +11,7 @@
         "iostream": "cpp"
     },
     "C_Cpp.vcFormat.newLine.beforeElse": false,
-    "C_Cpp.vcFormat.newLine.beforeCatch": false
+    "C_Cpp.vcFormat.newLine.beforeCatch": false,
+    "C_Cpp.vcFormat.space.afterCastCloseParenthesis": true,
+    "C_Cpp.vcFormat.space.pointerReferenceAlignment": "right"
 }
