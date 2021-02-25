@@ -427,7 +427,7 @@ void Lexer::inflateKeywords() {
     keywords["return"] = Token::RETURN;
 }
 
-void Lexer::panic(std::ifstream& inputStream, bool& loopFlag, std::string& word, int& state) {
+void Lexer::panic(std::ifstream &inputStream, bool &loopFlag, std::string &word, int &state) {
     inputStream.unget();
     word.clear();
     state = 0;
@@ -450,7 +450,7 @@ Token Lexer::makeToken(std::string name, Token::TokenType type) {
     return Token(name, type, fileName, line);
 }
 
-void Lexer::displayTokens(std::ostream& out, bool sortThem) {
+void Lexer::displayTokens(std::ostream &out, bool sortThem) {
     static const std::vector<std::string> tokenClassNames = {
             "ERROR_TOKEN",
             "VOID",
@@ -502,7 +502,7 @@ void Lexer::displayTokens(std::ostream& out, bool sortThem) {
     if (sortThem) {
         std::sort(toDisplayTokens.begin(), toDisplayTokens.end());
     }
-    for (const auto& token : toDisplayTokens) {
+    for (const auto &token : toDisplayTokens) {
         if (token.type == Token::WHITESPACE) {
             continue;
         }

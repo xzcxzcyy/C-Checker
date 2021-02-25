@@ -63,7 +63,7 @@ public:
         this->line = line;
     }
 
-    bool operator<(const Token& another) {
+    bool operator<(const Token &another) {
         if (this->type < another.type) {
             return true;
         }

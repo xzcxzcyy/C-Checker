@@ -22,7 +22,7 @@ private:
     bool isWhiteSpace(char c);
     bool isHexadecimal(char c);
     void inflateKeywords();
-    void panic(std::ifstream& inputStream, bool& loopFlag, std::string& word, int& state);
+    void panic(std::ifstream &inputStream, bool &loopFlag, std::string &word, int &state);
     Token makeToken(std::string name, Token::TokenType type);
 
 public:
@@ -33,7 +33,7 @@ public:
         errorCount = 0;
     }
 
-    std::vector<Token>& getTokens() {
+    std::vector<Token> &getTokens() {
         return tokens;
     }
 
@@ -42,7 +42,7 @@ public:
     }
 
     void analyze();
-    void displayTokens(std::ostream& out, bool sortThem);
+    void displayTokens(std::ostream &out, bool sortThem);
 };
 
 #endif
