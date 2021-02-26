@@ -1,0 +1,20 @@
+void main(){
+    int a=0;
+    char b = 'c';
+    short s = 0;
+    long l = 0x345L;
+    double _hihi = .2e3;
+    float FloatVar = 0.1;
+    const long cl = 1;
+    while(a){
+        for (int i=0;i<10;i=i+1) {
+            continue;
+        }
+        break;
+        if (a==0) b=1;else b = 0;
+    }
+    int array[100];
+    int somewhat=a+b-0x35*2/3%678;
+    return ab >= c && def < g || ccc<=d || cc>d || a!=bb;
+    int foo, fo;
+}
