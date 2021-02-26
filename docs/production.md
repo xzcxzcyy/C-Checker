@@ -22,8 +22,7 @@ TypeSpec -> int
 VarInitSeq -> VarInit , VarInitSeq
             | VarInit
 
-VarInit -> identifier = ConstNumber
-         | identifier = identifier
+VarInit -> identifier = Expression
          | identifier [ const_int ]
          | identifier
 
