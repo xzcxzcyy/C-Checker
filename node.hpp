@@ -21,7 +21,7 @@ public:
         FunDef,
         FunTypeSpec,
         ParameterList,
-        CompondStatements,
+        CompoundStatements,
         ParameterTypeList,
         Parameter,
         ParameterType,
@@ -36,13 +36,14 @@ public:
         LocalVarDef,
         Operand,
         Operator,
+        Epsilon,
     };
 
     NodeType type;
-    Token *info;
+    Token *info{};
     std::vector<Node *> children;
 
-    Node(NodeType type) : type(type) {
+    explicit Node(NodeType type) : type(type) {
         children.clear();
     }
 

@@ -31,7 +31,7 @@ ConstNumber -> const_int
              | const_float
              | const_char
 
-FunDef -> FunTypeSpec identifier(ParameterList) CompondStatements
+FunDef -> FunTypeSpec identifier(ParameterList) CompoundStatements
         | FunTypeSpec identifier(ParameterTypeList) ;
 
 FunTypeSpec -> void
@@ -53,14 +53,14 @@ ParameterTypeList -> ParameterType , ParameterTypeList
 ParameterType -> TypeSpec identifier
                | TypeSpec
 
-CompondStatements -> { Statements }
+CompoundStatements -> { Statements }
                    | { }
 
 Statements -> Statement Statements
             | Statement
 
 Statement -> Expression ;
-           | CompondStatements
+           | CompoundStatements
            | IfStatement
            | WhileStatement
            | ForStatement
