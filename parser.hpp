@@ -1,6 +1,7 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
+#include <utility>
 #include <vector>
 #include "token.hpp"
 
@@ -10,8 +11,9 @@ private:
     std::vector<Token>::iterator tokensIt;
 
 public:
-    Parser(std::vector<Token> ts) : tokens(ts) {
+    explicit Parser(std::vector<Token> ts) : tokens(std::move(ts)) {
         tokensIt = tokens.begin();
     }
 };
+
 #endif

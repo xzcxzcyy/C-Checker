@@ -1,5 +1,6 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
+
 #include <fstream>
 #include <string>
 #include <vector>
@@ -16,17 +17,25 @@ private:
     int line = 1;
 
     bool isUnderscore(char c);
+
     bool isDigit(char c);
+
     bool isLetter(char c);
+
     bool isEof(char c);
+
     bool isWhiteSpace(char c);
+
     bool isHexadecimal(char c);
+
     void inflateKeywords();
+
     void panic(std::ifstream &inputStream, bool &loopFlag, std::string &word, int &state);
+
     Token makeToken(std::string name, Token::TokenType type);
 
 public:
-    Lexer(std::string fileName) {
+    explicit Lexer(std::string fileName) {
         this->fileName = fileName;
         tokens.clear();
         inflateKeywords();
@@ -37,11 +46,12 @@ public:
         return tokens;
     }
 
-    int getErrorCount() {
+    int getErrorCount() const {
         return errorCount;
     }
 
     void analyze();
+
     void displayTokens(std::ostream &out, bool sortThem);
 };
 
