@@ -1,5 +1,6 @@
 #ifndef NODE_HPP
 #define NODE_HPP
+
 #include <vector>
 #include <string>
 #include "token.hpp"
@@ -40,12 +41,14 @@ public:
     };
 
     NodeType type;
-    Token *info{};
+    Token *info;
     std::vector<Node *> children;
 
-    explicit Node(NodeType type) : type(type) {
+    explicit Node(NodeType type) : type(type), info(nullptr) {
         children.clear();
     }
+
+    // TODO: release nodes in destructor
 
     void addChild(Node *kid);
 };
