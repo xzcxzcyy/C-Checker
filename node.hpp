@@ -38,6 +38,7 @@ public:
         Operand,
         Operator,
         Epsilon,
+        Const,
     };
 
     NodeType type;
@@ -48,7 +49,11 @@ public:
         children.clear();
     }
 
-    // TODO: release nodes in destructor
+    ~Node() {
+        for (auto child : children) {
+            delete child;
+        }
+    }
 
     void addChild(Node *kid);
 };

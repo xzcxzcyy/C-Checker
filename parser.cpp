@@ -1,3 +1,4 @@
+#include <iostream>
 #include "parser.hpp"
 #include "node.hpp"
 #include "token.hpp"
@@ -76,4 +77,88 @@ bool Parser::isFunTypeSpec(std::vector<Token>::iterator t) {
            || t->type == Token::LONG
            || t->type == Token::DOUBLE
            || t->type == Token::FLOAT;
+}
+
+Node *Parser::extVarDef() {
+    auto varDefNode = varDef();
+    if (varDefNode != nullptr) {
+        auto root = new Node(Node::ExtVarDef);
+        root->children.push_back(varDefNode);
+        return root;
+    } else {
+        return nullptr;
+    }
+}
+
+Node *Parser::varDef() {
+    if (current >= tokens.end()) {
+        if (!tokens.empty()) {
+            logError("Illegal variable definition", tokens.end() - 1);
+        }
+        return nullptr;
+    }
+    auto root = new Node(Node::VarDef);
+    if (isTypeSpec(current)) {
+        auto typeSpecNode = new Node(Node::TypeSpec);
+        typeSpecNode->info = &*current;
+        root->children.push_back(typeSpecNode);
+        current++;
+        if (current == tokens.end()) {
+            logError("Incomplete variable definition", tokens.end() - 1);
+            delete root;
+            return nullptr;
+        }
+        if (current->type == Token::CONST) {
+            auto constNode = new Node(Node::Const);
+            root->children.push_back(constNode);
+            current++;
+        }
+        if (current == tokens.end()) {
+            logError("Incomplete variable definition", tokens.end() - 1);
+            delete root;
+            return nullptr;
+        }
+    } else if (current->type == Token::CONST) {
+        auto constNode = new Node(Node::Const);
+        root->children.push_back(constNode);
+        current++;
+        if (current == tokens.end()) {
+            logError("Incomplete variable definition", tokens.end() - 1);
+            delete root;
+            return nullptr;
+        }
+        if (!isTypeSpec(current)) {
+            logError("Illegal variable definition", current);
+            delete root;
+            return nullptr;
+        }
+        auto typeSpecNode = new Node(Node::TypeSpec);
+        typeSpecNode->info = &*current;
+        root->children.push_back(typeSpecNode);
+    }
+    auto varInitSeqNode = varInitSeq();
+    if (varInitSeqNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->children.push_back(varInitSeqNode);
+    }
+    if (current >= tokens.end()) {
+        logError("Require semicolon at the end of variable definition", tokens.end() - 1);
+        delete root;
+        return nullptr;
+    }
+    if (current->type != Token::SEMICOL) {
+        logError("Require semicolon at the end of variable definition", current);
+        delete root;
+        return nullptr;
+    }
+    current++;
+    return root;
+}
+
+void Parser::logError(const std::string &reason, std::vector<Token>::iterator pos) {
+    out << "Parsing error at line " << pos->line
+        << " " << reason
+        << std::endl;
 }

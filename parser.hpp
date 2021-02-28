@@ -3,6 +3,8 @@
 
 #include <utility>
 #include <vector>
+#include <string>
+#include <iostream>
 #include "token.hpp"
 #include "node.hpp"
 
@@ -10,6 +12,7 @@ class Parser {
 private:
     std::vector<Token> tokens;
     std::vector<Token>::iterator current;
+    std::ostream &out;
 
     Node *program();
 
@@ -57,12 +60,14 @@ private:
 
     Node *forStatement();
 
+    void logError(const std::string &reason, std::vector<Token>::iterator pos);
+
     static bool isTypeSpec(std::vector<Token>::iterator t);
 
     static bool isFunTypeSpec(std::vector<Token>::iterator t);
 
 public:
-    explicit Parser(std::vector<Token> ts) : tokens(std::move(ts)) {
+    explicit Parser(std::vector<Token> ts, std::ostream &out) : tokens(std::move(ts)), out(out) {
         current = tokens.begin();
     }
 };
