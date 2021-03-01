@@ -23,14 +23,14 @@ Node *Parser::extDefList() {
         return nullptr;
     }
     auto root = new Node(Node::ExtDefList);
-    root->children.push_back(child1);
+    root->addChild(child1);
     if (current != tokens.end()) {
         auto child2 = extDefList();
         if (child2 == nullptr) {
             delete root;
             return nullptr;
         }
-        root->children.push_back(child2);
+        root->addChild(child2);
     }
     return root;
 }
@@ -48,7 +48,7 @@ Node *Parser::extDef() {
             delete root;
             return nullptr;
         }
-        root->children.push_back(funDefNode);
+        root->addChild(funDefNode);
         return root;
     } else {
         auto extVarDefNode = extVarDef();
@@ -56,7 +56,7 @@ Node *Parser::extDef() {
             delete root;
             return nullptr;
         }
-        root->children.push_back(extVarDefNode);
+        root->addChild(extVarDefNode);
         return root;
     }
 }
@@ -84,7 +84,7 @@ Node *Parser::extVarDef() {
     auto varDefNode = varDef();
     if (varDefNode != nullptr) {
         auto root = new Node(Node::ExtVarDef);
-        root->children.push_back(varDefNode);
+        root->addChild(varDefNode);
         return root;
     } else {
         return nullptr;
@@ -101,7 +101,7 @@ Node *Parser::varDef() {
     auto root = new Node(Node::VarDef);
     if (isTypeSpec(current)) {
         auto typeSpecNode = new Node(Node::TypeSpec, *current);
-        root->children.push_back(typeSpecNode);
+        root->addChild(typeSpecNode);
         current++;
         if (current == tokens.end()) {
             logError("Incomplete variable definition", tokens.end() - 1);
@@ -110,7 +110,7 @@ Node *Parser::varDef() {
         }
         if (current->type == Token::CONST) {
             auto constNode = new Node(Node::Const);
-            root->children.push_back(constNode);
+            root->addChild(constNode);
             current++;
         }
         if (current == tokens.end()) {
@@ -120,7 +120,7 @@ Node *Parser::varDef() {
         }
     } else if (current->type == Token::CONST) {
         auto constNode = new Node(Node::Const);
-        root->children.push_back(constNode);
+        root->addChild(constNode);
         current++;
         if (current == tokens.end()) {
             logError("Incomplete variable definition", tokens.end() - 1);
@@ -133,14 +133,14 @@ Node *Parser::varDef() {
             return nullptr;
         }
         auto typeSpecNode = new Node(Node::TypeSpec, *current);
-        root->children.push_back(typeSpecNode);
+        root->addChild(typeSpecNode);
     }
     auto varInitSeqNode = varInitSeq();
     if (varInitSeqNode == nullptr) {
         delete root;
         return nullptr;
     } else {
-        root->children.push_back(varInitSeqNode);
+        root->addChild(varInitSeqNode);
     }
     auto checkRes = checkTerminal(current, Token::SEMICOL);
     if (checkRes.has_value()) {
@@ -177,7 +177,7 @@ Node *Parser::varInitSeq() {
         delete root;
         return nullptr;
     }
-    root->children.push_back(child1);
+    root->addChild(child1);
     auto result = checkTerminal(current, Token::COMMA);
     if (!result.has_value()) {
         current++;
@@ -186,7 +186,7 @@ Node *Parser::varInitSeq() {
             delete root;
             return nullptr;
         }
-        root->children.push_back(varInitSeqNode);
+        root->addChild(varInitSeqNode);
     }
     return root;
 }
