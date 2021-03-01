@@ -62,6 +62,10 @@ private:
 
     void logError(const std::string &reason, std::vector<Token>::iterator pos);
 
+    void logError(const std::string &reason, int line);
+
+    int checkTerminal(std::vector<Token>::iterator t, Token::TokenType type);
+
     static bool isTypeSpec(std::vector<Token>::iterator t);
 
     static bool isFunTypeSpec(std::vector<Token>::iterator t);

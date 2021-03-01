@@ -143,13 +143,9 @@ Node *Parser::varDef() {
     } else {
         root->children.push_back(varInitSeqNode);
     }
-    if (current >= tokens.end()) {
-        logError("Require semicolon at the end of variable definition", tokens.end() - 1);
-        delete root;
-        return nullptr;
-    }
-    if (current->type != Token::SEMICOL) {
-        logError("Require semicolon at the end of variable definition", current);
+    int checkCode = checkTerminal(current, Token::SEMICOL);
+    if (checkCode != 0) {
+        logError("Require semicolon at the end of variable definition.", checkCode);
         delete root;
         return nullptr;
     }
@@ -158,7 +154,23 @@ Node *Parser::varDef() {
 }
 
 void Parser::logError(const std::string &reason, std::vector<Token>::iterator pos) {
-    out << "Parsing error at line " << pos->line
+    logError(reason, pos->line);
+}
+
+void Parser::logError(const std::string &reason, int line) {
+    out << "Parsing error at line " << line
         << " " << reason
         << std::endl;
+}
+
+int Parser::checkTerminal(std::vector<Token>::iterator t, Token::TokenType type) {
+    if (t >= tokens.end()) {
+        return (tokens.end() - 1)->line;
+    } else  {
+        if (t->type != type) {
+            return t->line;
+        } else {
+            return 0;
+        }
+    }
 }
