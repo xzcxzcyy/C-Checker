@@ -1,6 +1,7 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
+#include <utility>
 #include <vector>
 #include <optional>
 #include <string>
@@ -50,7 +51,9 @@ public:
         children.clear();
     }
 
-    Node(NodeType type, Token token) : type(type), info(std::move(token)) {}
+    Node(NodeType type, Token token) : type(type), info(std::move(token)) {
+        children.clear();
+    }
 
     ~Node() {
         for (auto child : children) {
