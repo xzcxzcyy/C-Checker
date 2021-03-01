@@ -1,4 +1,5 @@
 #include <iostream>
+#include <optional>
 #include "parser.hpp"
 #include "node.hpp"
 #include "token.hpp"
@@ -193,4 +194,15 @@ Node *Parser::varInitSeq() {
         root->children.push_back(varInitSeqNode);
     }
     return root;
+}
+
+Node *Parser::varInit() {
+    auto root = new Node(Node::VarInit);
+    int checkCode = checkTerminal(current, Token::IDENTIFIER);
+    if (checkCode != 0) {
+        delete root;
+        logError("Variable initialization requires an identifier.", checkCode);
+        return nullptr;
+    }
+    auto identifierNode = new Node(Node::Identifier);
 }

@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <optional>
 #include "token.hpp"
 #include "node.hpp"
 
