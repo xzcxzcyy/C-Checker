@@ -134,6 +134,7 @@ Node *Parser::varDef() {
         }
         auto typeSpecNode = new Node(Node::TypeSpec, *current);
         root->addChild(typeSpecNode);
+        current++;
     }
     auto varInitSeqNode = varInitSeq();
     if (varInitSeqNode == nullptr) {
@@ -196,8 +197,39 @@ Node *Parser::varInit() {
     auto result = checkTerminal(current, Token::IDENTIFIER);
     if (result.has_value()) {
         delete root;
-        logError("Variable initialization requires an identifier.", result.value());
+        logError("Requires an identifier.", result.value());
         return nullptr;
     }
-    auto identifierNode = new Node(Node::Identifier);
+    auto identifierNode = new Node(Node::Identifier, *current);
+    root->addChild(identifierNode);
+    current++;
+    if (!checkTerminal(current, Token::ASSIGN).has_value()) {
+        current++;
+        auto exp = expression();
+        if (exp == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(exp);
+        }
+    } else if (!checkTerminal(current, Token::OPEN_BRACKET).has_value()) {
+        current++;
+        auto isConstInt = checkTerminal(current, Token::CONST_INT);
+        if (isConstInt.has_value()) {
+            logError("Requires CONST_INT token for array declaration.", isConstInt.value());
+            delete root;
+            return nullptr;
+        }
+        auto constIntNode = new Node(Node::ConstNumber, *current);
+        current++;
+        root->addChild(constIntNode);
+        auto isCloseBracket = checkTerminal(current, Token::CLOSE_BRACKET);
+        if (isCloseBracket.has_value()) {
+            logError("Requires a close bracket for array declaration.", isCloseBracket.value());
+            delete root;
+            return nullptr;
+        }
+        current++;
+    }
+    return root;
 }

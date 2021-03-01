@@ -63,8 +63,6 @@ private:
 
     void logError(const std::string &reason, iterator pos);
 
-    void logError(const std::string &reason, int line);
-
     std::optional<iterator> checkTerminal(iterator t, Token::TokenType type);
 
     static bool isTypeSpec(iterator t);
