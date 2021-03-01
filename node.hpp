@@ -2,6 +2,7 @@
 #define NODE_HPP
 
 #include <vector>
+#include <optional>
 #include <string>
 #include "token.hpp"
 
@@ -42,12 +43,14 @@ public:
     };
 
     NodeType type;
-    Token *info;
+    std::optional<Token> info;
     std::vector<Node *> children;
 
-    explicit Node(NodeType type) : type(type), info(nullptr) {
+    explicit Node(NodeType type) : type(type), info({}) {
         children.clear();
     }
+
+    Node(NodeType type, Token token) : type(type), info(std::move(token)) {}
 
     ~Node() {
         for (auto child : children) {

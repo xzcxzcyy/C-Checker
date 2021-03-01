@@ -11,8 +11,10 @@
 
 class Parser {
 private:
+    typedef std::vector<Token>::iterator iterator;
+
     std::vector<Token> tokens;
-    std::vector<Token>::iterator current;
+    iterator current;
     std::ostream &out;
 
     Node *program();
@@ -59,15 +61,15 @@ private:
 
     Node *forStatement();
 
-    void logError(const std::string &reason, std::vector<Token>::iterator pos);
+    void logError(const std::string &reason, iterator pos);
 
     void logError(const std::string &reason, int line);
 
-    int checkTerminal(std::vector<Token>::iterator t, Token::TokenType type);
+    std::optional<iterator> checkTerminal(iterator t, Token::TokenType type);
 
-    static bool isTypeSpec(std::vector<Token>::iterator t);
+    static bool isTypeSpec(iterator t);
 
-    static bool isFunTypeSpec(std::vector<Token>::iterator t);
+    static bool isFunTypeSpec(iterator t);
 
 public:
     explicit Parser(std::vector<Token> ts, std::ostream &out) : tokens(std::move(ts)), out(out) {

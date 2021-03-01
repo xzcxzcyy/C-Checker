@@ -10,7 +10,7 @@ Node *Parser::program() {
     }
     auto programNode = new Node(Node::Program);
     auto extDefListNode = extDefList();
-    programNode->children.push_back(extDefListNode);
+    programNode->addChild(extDefListNode);
     return programNode;
 }
 
@@ -61,7 +61,7 @@ Node *Parser::extDef() {
     }
 }
 
-bool Parser::isTypeSpec(std::vector<Token>::iterator t) {
+bool Parser::isTypeSpec(iterator t) {
     return t->type == Token::INT
            || t->type == Token::CHAR
            || t->type == Token::SHORT
@@ -70,7 +70,7 @@ bool Parser::isTypeSpec(std::vector<Token>::iterator t) {
            || t->type == Token::FLOAT;
 }
 
-bool Parser::isFunTypeSpec(std::vector<Token>::iterator t) {
+bool Parser::isFunTypeSpec(iterator t) {
     return t->type == Token::VOID
            || t->type == Token::INT
            || t->type == Token::CHAR
@@ -100,8 +100,7 @@ Node *Parser::varDef() {
     }
     auto root = new Node(Node::VarDef);
     if (isTypeSpec(current)) {
-        auto typeSpecNode = new Node(Node::TypeSpec);
-        typeSpecNode->info = &*current;
+        auto typeSpecNode = new Node(Node::TypeSpec, *current);
         root->children.push_back(typeSpecNode);
         current++;
         if (current == tokens.end()) {
@@ -133,8 +132,7 @@ Node *Parser::varDef() {
             delete root;
             return nullptr;
         }
-        auto typeSpecNode = new Node(Node::TypeSpec);
-        typeSpecNode->info = &*current;
+        auto typeSpecNode = new Node(Node::TypeSpec, *current);
         root->children.push_back(typeSpecNode);
     }
     auto varInitSeqNode = varInitSeq();
@@ -144,9 +142,9 @@ Node *Parser::varDef() {
     } else {
         root->children.push_back(varInitSeqNode);
     }
-    int checkCode = checkTerminal(current, Token::SEMICOL);
-    if (checkCode != 0) {
-        logError("Require semicolon at the end of variable definition.", checkCode);
+    auto checkRes = checkTerminal(current, Token::SEMICOL);
+    if (checkRes.has_value()) {
+        logError("Require semicolon at the end of variable definition.", checkRes.value());
         delete root;
         return nullptr;
     }
@@ -154,24 +152,20 @@ Node *Parser::varDef() {
     return root;
 }
 
-void Parser::logError(const std::string &reason, std::vector<Token>::iterator pos) {
-    logError(reason, pos->line);
-}
-
-void Parser::logError(const std::string &reason, int line) {
-    out << "Parsing error at line " << line
-        << " " << reason
+void Parser::logError(const std::string &reason, iterator pos) {
+    out << "Parsing error at line " << pos->line
+        << " in file " << pos->fileName << ": " << reason
         << std::endl;
 }
 
-int Parser::checkTerminal(std::vector<Token>::iterator t, Token::TokenType type) {
+std::optional<Parser::iterator> Parser::checkTerminal(iterator t, Token::TokenType type) {
     if (t >= tokens.end()) {
-        return (tokens.end() - 1)->line;
+        return tokens.end() - 1;
     } else {
         if (t->type != type) {
-            return t->line;
+            return t;
         } else {
-            return 0;
+            return {};
         }
     }
 }
@@ -184,8 +178,9 @@ Node *Parser::varInitSeq() {
         return nullptr;
     }
     root->children.push_back(child1);
-    int checkCode = checkTerminal(current, Token::COMMA);
-    if (checkCode == 0) {
+    auto result = checkTerminal(current, Token::COMMA);
+    if (!result.has_value()) {
+        current++;
         auto varInitSeqNode = varInitSeq();
         if (varInitSeqNode == nullptr) {
             delete root;
@@ -198,10 +193,10 @@ Node *Parser::varInitSeq() {
 
 Node *Parser::varInit() {
     auto root = new Node(Node::VarInit);
-    int checkCode = checkTerminal(current, Token::IDENTIFIER);
-    if (checkCode != 0) {
+    auto result = checkTerminal(current, Token::IDENTIFIER);
+    if (result.has_value()) {
         delete root;
-        logError("Variable initialization requires an identifier.", checkCode);
+        logError("Variable initialization requires an identifier.", result.value());
         return nullptr;
     }
     auto identifierNode = new Node(Node::Identifier);
