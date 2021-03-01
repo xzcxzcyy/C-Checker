@@ -166,11 +166,31 @@ void Parser::logError(const std::string &reason, int line) {
 int Parser::checkTerminal(std::vector<Token>::iterator t, Token::TokenType type) {
     if (t >= tokens.end()) {
         return (tokens.end() - 1)->line;
-    } else  {
+    } else {
         if (t->type != type) {
             return t->line;
         } else {
             return 0;
         }
     }
+}
+
+Node *Parser::varInitSeq() {
+    auto root = new Node(Node::VarInitSeq);
+    auto child1 = varInit();
+    if (child1 == nullptr) {
+        delete root;
+        return nullptr;
+    }
+    root->children.push_back(child1);
+    int checkCode = checkTerminal(current, Token::COMMA);
+    if (checkCode == 0) {
+        auto varInitSeqNode = varInitSeq();
+        if (varInitSeqNode == nullptr) {
+            delete root;
+            return nullptr;
+        }
+        root->children.push_back(varInitSeqNode);
+    }
+    return root;
 }

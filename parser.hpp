@@ -24,8 +24,6 @@ private:
 
     Node *varDef();
 
-    Node *typeSpec();
-
     Node *varInitSeq();
 
     Node *varInit();
