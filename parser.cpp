@@ -154,6 +154,9 @@ Node *Parser::varDef() {
 }
 
 void Parser::logError(const std::string &reason, iterator pos) {
+    if (pos >= tokens.end()) {
+        pos = tokens.end() - 1;
+    }
     out << "Parsing error at line " << pos->line
         << " in file " << pos->fileName << ": " << reason
         << std::endl;
@@ -230,6 +233,103 @@ Node *Parser::varInit() {
             return nullptr;
         }
         current++;
+    }
+    return root;
+}
+
+Node *Parser::funDef() {
+    auto root = new Node(Node::FunDef);
+    if (current >= tokens.end()) {
+        delete root;
+        return nullptr;
+    }
+    if (isFunTypeSpec(current)) {
+        auto funTypeSpecNode = new Node(Node::FunTypeSpec, *current);
+        current++;
+        root->addChild(funTypeSpecNode);
+    } else {
+        logError("Requires a function return type specifier.", current);
+        delete root;
+        return nullptr;
+    }
+    auto isIdentifier = checkTerminal(current, Token::IDENTIFIER);
+    if (!isIdentifier.has_value()) {
+        auto identifierNode = new Node(Node::Identifier, *current);
+        current++;
+        root->addChild(identifierNode);
+    } else {
+        logError("Requires an identifier for function definition.", isIdentifier.value());
+        delete root;
+        return nullptr;
+    }
+    auto isOpenParen = checkTerminal(current, Token::OPEN_PAREN);
+    if (!isOpenParen.has_value()) {
+        current++;
+    } else {
+        logError("Missing OPEN_PAREN for function definition", isOpenParen.value());
+        delete root;
+        return nullptr;
+    }
+    int productionType = 0;
+    for (auto it = current; it != tokens.end(); it++) {
+        if (it->type == Token::CLOSE_PAREN && it + 1 != tokens.end()) {
+            if ((it + 1)->type == Token::OPEN_BRACE) {
+                productionType = 1;
+            } else if ((it + 1)->type == Token::SEMICOL) {
+                productionType = 2;
+            }
+            break;
+        }
+    }
+    if (productionType == 0) {
+        logError("incomplete function definition.", current);
+        delete root;
+        return nullptr;
+    } else if (productionType == 1) {
+        auto parameterListNode = parameterList();
+        if (parameterListNode == nullptr) {
+            delete root;
+            return nullptr;
+        }
+        root->addChild(parameterListNode);
+        auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
+        if (!isCloseParen.has_value()) {
+            current++;
+        } else {
+            logError("Function definition requires CLOSE_PAREN.", isCloseParen.value());
+            delete root;
+            return nullptr;
+        }
+        auto compoundStatNode = compoundStatements();
+        if (compoundStatNode == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(compoundStatNode);
+        }
+    } else {
+        auto parameterTypeListNode = parameterTypeList();
+        if (parameterTypeListNode == nullptr) {
+            delete root;
+            return nullptr;
+        }
+        root->addChild(parameterTypeListNode);
+        auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
+        if (!isCloseParen.has_value()) {
+            current++;
+        } else {
+            logError("Function definition requires CLOSE_PAREN.", isCloseParen.value());
+            delete root;
+            return nullptr;
+        }
+        auto isSemi = checkTerminal(current, Token::SEMICOL);
+        if (isSemi.has_value()) {
+            logError("expect a semicolon for function declaration", isSemi.value());
+            delete root;
+            return nullptr;
+        } else {
+            current++;
+        }
     }
     return root;
 }

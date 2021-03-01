@@ -31,8 +31,6 @@ private:
 
     Node *varInit();
 
-    Node *constNumber();
-
     Node *funDef();
 
     Node *funTypeSpec();
