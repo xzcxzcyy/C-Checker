@@ -390,3 +390,25 @@ Node *Parser::parameter() {
     }
     return root;
 }
+
+Node *Parser::parameterTypeList() {
+    auto root = new Node(Node::ParameterTypeList);
+    auto parameterTypeNode = parameterType();
+    if (parameterTypeNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(parameterTypeNode);
+    }
+    if (!checkTerminal(current, Token::COMMA).has_value()) {
+        current++;
+        auto parameterTypeListNode = parameterTypeList();
+        if (parameterTypeListNode == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(parameterTypeListNode);
+        }
+    }
+    return root;
+}
