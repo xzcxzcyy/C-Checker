@@ -563,3 +563,15 @@ Node *Parser::statement() {
     }
     return root;
 }
+
+Node *Parser::localVarDef() {
+    auto root = new Node(Node::LocalVarDef);
+    auto varDefNode = varDef();
+    if (varDefNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(varDefNode);
+    }
+    return root;
+}
