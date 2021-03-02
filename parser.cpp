@@ -412,3 +412,28 @@ Node *Parser::parameterTypeList() {
     }
     return root;
 }
+
+Node *Parser::parameterType() {
+    auto root = new Node(Node::ParameterType);
+    if (current >= tokens.end()) {
+        logError("type specifier required.", tokens.end() - 1);
+        delete root;
+        return nullptr;
+    }
+    if (!isTypeSpec(current)) {
+        logError("type specifier required.", current);
+        delete root;
+        return nullptr;
+    } else {
+        auto typeSpecNode = new Node(Node::TypeSpec, *current);
+        current++;
+        root->addChild(typeSpecNode);
+    }
+    auto isIdentifier = checkTerminal(current, Token::IDENTIFIER);
+    if (!isIdentifier.has_value()) {
+        auto identifierNode = new Node(Node::Identifier, *current);
+        current++;
+        root->addChild(identifierNode);
+    }
+    return root;
+}
