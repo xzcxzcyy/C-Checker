@@ -469,3 +469,26 @@ Node *Parser::compoundStatements() {
     }
     return root;
 }
+
+Node *Parser::statements() {
+
+}
+
+bool Parser::isConstNumber(Parser::iterator t) {
+    auto type = t->type;
+    return type == Token::CONST_INT
+           || type == Token::CONST_CHAR
+           || type == Token::CONST_FLOAT
+           || type == Token::CONST_LONG;
+}
+
+bool Parser::isFirstOfExpression(Parser::iterator t) {
+    return t->type == Token::OPEN_PAREN
+           || t->type == Token::IDENTIFIER
+           || isConstNumber(t);
+}
+
+bool Parser::isFirstOfLocalVarDef(Parser::iterator t) {
+    return t->type == Token::CONST
+           || isTypeSpec(t);
+}

@@ -65,6 +65,12 @@ private:
 
     static bool isFunTypeSpec(iterator t);
 
+    static bool isConstNumber(iterator t);
+
+    static bool isFirstOfExpression(iterator t);
+
+    static bool isFirstOfLocalVarDef(iterator t);
+
 public:
     explicit Parser(std::vector<Token> ts, std::ostream &out) : tokens(std::move(ts)), out(out) {
         current = tokens.begin();
