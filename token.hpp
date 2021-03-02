@@ -50,6 +50,11 @@ public:
         WHITESPACE,
         ASSIGN,
         COMMENTS,
+        PLUS_ASSIGN,
+        MINUS_ASSIGN,
+        TIMES_ASSIGN,
+        DIVIDE_ASSIGN,
+        MOD_ASSIGN,
     };
     TokenType type;
     std::string name;

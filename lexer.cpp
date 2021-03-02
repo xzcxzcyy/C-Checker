@@ -45,13 +45,17 @@ void Lexer::analyze() {
                 } else if (ch == '}') {
                     tokens.push_back(makeToken("}", Token::CLOSE_BRACE));
                 } else if (ch == '+') {
-                    tokens.push_back(makeToken("+", Token::PLUS));
+                    state = 20;
+                    word.push_back(ch);
                 } else if (ch == '-') {
-                    tokens.push_back(makeToken("-", Token::MINUS));
+                    state = 21;
+                    word.push_back(ch);
                 } else if (ch == '*') {
-                    tokens.push_back(makeToken("*", Token::TIMES));
+                    state = 22;
+                    word.push_back(ch);
                 } else if (ch == '/') {
-                    tokens.push_back(makeToken("/", Token::DIVIDE));
+                    state = 23;
+                    word.push_back(ch);
                 } else if (ch == ';') {
                     tokens.push_back(makeToken(";", Token::SEMICOL));
                 } else if (ch == ',') {
@@ -62,7 +66,8 @@ void Lexer::analyze() {
                         // tokens.push_back(makeToken("\n", Token::WHITESPACE));
                     }
                 } else if (ch == '%') {
-                    tokens.push_back(makeToken("%", Token::MOD));
+                    state = 24;
+                    word.push_back(ch);
                 } else if (ch == '>') {
                     word.push_back(ch);
                     state = 14;
@@ -378,6 +383,76 @@ void Lexer::analyze() {
                 }
                 break;
 
+            case 20:
+                if (ch == '=') {
+                    word.push_back(ch);
+                    tokens.push_back(makeToken(word, Token::PLUS_ASSIGN));
+                    word.clear();
+                    state = 0;
+                } else {
+                    inputStream.unget();
+                    tokens.push_back(makeToken(word, Token::PLUS));
+                    word.clear();
+                    state = 0;
+                }
+                break;
+
+            case 21:
+                if (ch == '=') {
+                    word.push_back(ch);
+                    tokens.push_back(makeToken(word, Token::MINUS_ASSIGN));
+                    word.clear();
+                    state = 0;
+                } else {
+                    inputStream.unget();
+                    tokens.push_back(makeToken(word, Token::MINUS));
+                    word.clear();
+                    state = 0;
+                }
+                break;
+
+            case 22:
+                if (ch == '=') {
+                    word.push_back(ch);
+                    tokens.push_back(makeToken(word, Token::TIMES_ASSIGN));
+                    word.clear();
+                    state = 0;
+                } else {
+                    inputStream.unget();
+                    tokens.push_back(makeToken(word, Token::TIMES));
+                    word.clear();
+                    state = 0;
+                }
+                break;
+
+            case 23:
+                if (ch == '=') {
+                    word.push_back(ch);
+                    tokens.push_back(makeToken(word, Token::DIVIDE_ASSIGN));
+                    word.clear();
+                    state = 0;
+                } else {
+                    inputStream.unget();
+                    tokens.push_back(makeToken(word, Token::DIVIDE));
+                    word.clear();
+                    state = 0;
+                }
+                break;
+
+            case 24:
+                if (ch == '=') {
+                    word.push_back(ch);
+                    tokens.push_back(makeToken(word, Token::MOD_ASSIGN));
+                    word.clear();
+                    state = 0;
+                } else {
+                    inputStream.unget();
+                    tokens.push_back(makeToken(word, Token::MOD));
+                    word.clear();
+                    state = 0;
+                }
+                break;
+
             default:
                 throw "ILLEGAL_LEXER_STATE_EXP";
         }
@@ -496,7 +571,12 @@ void Lexer::displayTokens(std::ostream &out, bool sortThem) {
             "COMMA",
             "WHITESPACE",
             "ASSIGN",
-            "COMMENTS"
+            "COMMENTS",
+            "PLUS_ASSIGN",
+            "MINUS_ASSIGN",
+            "TIMES_ASSIGN",
+            "DIVIDE_ASSIGN",
+            "MOD_ASSIGN",
     };
     auto toDisplayTokens = tokens;
     if (sortThem) {

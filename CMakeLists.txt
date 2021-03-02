@@ -7,6 +7,7 @@ include(CTest)
 enable_testing()
 
 add_executable(cchecker main.cpp lexer.cpp lexer.hpp token.hpp parser.hpp parser.cpp node.hpp node.cpp)
+add_executable(lexer main.cpp lexer.cpp lexer.hpp token.hpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
