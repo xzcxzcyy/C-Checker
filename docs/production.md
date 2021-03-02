@@ -31,6 +31,7 @@ ConstNumber -> const_int
              | const_float
              | const_char
 
+// ParameterList and ParameterTypeList are optional
 FunDef -> FunTypeSpec identifier ( ParameterList ) CompoundStatements
         | FunTypeSpec identifier ( ParameterTypeList ) ;
 

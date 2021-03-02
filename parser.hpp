@@ -33,8 +33,6 @@ private:
 
     Node *funDef();
 
-    Node *funTypeSpec();
-
     Node *parameterList();
 
     Node *parameter();

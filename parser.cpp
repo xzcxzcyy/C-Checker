@@ -286,12 +286,15 @@ Node *Parser::funDef() {
         delete root;
         return nullptr;
     } else if (productionType == 1) {
-        auto parameterListNode = parameterList();
-        if (parameterListNode == nullptr) {
-            delete root;
-            return nullptr;
+        if (current->type != Token::CLOSE_PAREN) {
+            auto parameterListNode = parameterList();
+            if (parameterListNode == nullptr) {
+                delete root;
+                return nullptr;
+            }
+            root->addChild(parameterListNode);
         }
-        root->addChild(parameterListNode);
+
         auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
         if (!isCloseParen.has_value()) {
             current++;
@@ -308,12 +311,15 @@ Node *Parser::funDef() {
             root->addChild(compoundStatNode);
         }
     } else {
-        auto parameterTypeListNode = parameterTypeList();
-        if (parameterTypeListNode == nullptr) {
-            delete root;
-            return nullptr;
+        if (current->type != Token::CLOSE_PAREN) {
+            auto parameterTypeListNode = parameterTypeList();
+            if (parameterTypeListNode == nullptr) {
+                delete root;
+                return nullptr;
+            }
+            root->addChild(parameterTypeListNode);
         }
-        root->addChild(parameterTypeListNode);
+
         auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
         if (!isCloseParen.has_value()) {
             current++;
@@ -332,4 +338,8 @@ Node *Parser::funDef() {
         }
     }
     return root;
+}
+
+Node *Parser::parameterList() {
+    
 }
