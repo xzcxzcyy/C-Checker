@@ -471,7 +471,35 @@ Node *Parser::compoundStatements() {
 }
 
 Node *Parser::statements() {
-
+    auto root = new Node(Node::Statements);
+    auto statNode = statement();
+    if (statNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(statNode);
+    }
+    if (current < tokens.end()) {
+        if (isFirstOfExpression(current)
+            || current->type == Token::OPEN_BRACE
+            || current->type == Token::IF
+            || current->type == Token::WHILE
+            || current->type == Token::FOR
+            || current->type == Token::RETURN
+            || current->type == Token::BREAK
+            || current->type == Token::CONTINUE
+            || isFirstOfLocalVarDef(current)
+            || current->type == Token::SEMICOL) {
+            auto statementsNode = statements();
+            if (statementsNode == nullptr) {
+                delete root;
+                return nullptr;
+            } else {
+                root->addChild(statementsNode);
+            }
+        }
+    }
+    return root;
 }
 
 bool Parser::isConstNumber(Parser::iterator t) {
