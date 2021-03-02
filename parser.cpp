@@ -341,5 +341,23 @@ Node *Parser::funDef() {
 }
 
 Node *Parser::parameterList() {
-    
+    auto root = new Node(Node::ParameterList);
+    auto parameterNode = parameter();
+    if (parameterNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(parameterNode);
+    }
+    if (!checkTerminal(current, Token::COMMA).has_value()) {
+        current++;
+        auto parameterListNode = parameterList();
+        if (parameterListNode == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(parameterListNode);
+        }
+    }
+    return root;
 }
