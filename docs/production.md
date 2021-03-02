@@ -65,9 +65,9 @@ Statement -> Expression ;
            | IfStatement
            | WhileStatement
            | ForStatement
-           | return Expression ;
-           | break ;
-           | continue ;
+           | ReturnStatement
+           | BreakStatement
+           | ContinueStatement
            | LocalVarDef
            | ;
 
@@ -82,3 +82,9 @@ WhileStatement -> while ( Expression ) Statement
 
 ForStatement -> for ( LocalVarDef Expression ; Expression ) Statement
               | for ( Expression ; Expression ; Expression ) Statement
+
+ReturnStatement -> return Expression ;
+
+BreakStatement -> break ;
+
+ContinueStatement -> continue ;

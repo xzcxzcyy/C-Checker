@@ -57,6 +57,12 @@ private:
 
     Node *forStatement();
 
+    Node *returnStatement();
+
+    Node *breakStatement();
+
+    Node *continueStatement();
+
     void logError(const std::string &reason, iterator pos);
 
     std::optional<iterator> checkTerminal(iterator t, Token::TokenType type);

@@ -520,3 +520,46 @@ bool Parser::isFirstOfLocalVarDef(Parser::iterator t) {
     return t->type == Token::CONST
            || isTypeSpec(t);
 }
+
+Node *Parser::statement() {
+    auto root = new Node(Node::Statement);
+    Node *child = nullptr;
+    if (current >= tokens.end()) {
+        logError("A statement is expected.", tokens.end() - 1);
+        delete root;
+        return nullptr;
+    }
+    if (isFirstOfExpression(current)) {
+        child = expression();
+    } else if (current->type == Token::OPEN_BRACE) {
+        child = compoundStatements();
+    } else if (current->type == Token::IF) {
+        child = ifStatement();
+    } else if (current->type == Token::WHILE) {
+        child = whileStatement();
+    } else if (current->type == Token::FOR) {
+        child = forStatement();
+    } else if (current->type == Token::RETURN) {
+        child = returnStatement();
+    } else if (current->type == Token::BREAK) {
+        child = breakStatement();
+    } else if (current->type == Token::CONTINUE) {
+        child = continueStatement();
+    } else if (isFirstOfLocalVarDef(current)) {
+        child = localVarDef();
+    } else if (current->type == Token::SEMICOL) {
+        current++;
+        return root;
+    } else {
+        logError("Illegal statement!", current);
+        delete root;
+        return nullptr;
+    }
+    if (child == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(child);
+    }
+    return root;
+}
