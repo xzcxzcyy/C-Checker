@@ -55,7 +55,7 @@ ParameterType -> TypeSpec identifier
                | TypeSpec
 
 CompoundStatements -> { Statements }
-                   | { }
+                    | { }
 
 Statements -> Statement Statements
             | Statement

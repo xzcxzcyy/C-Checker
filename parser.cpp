@@ -437,3 +437,35 @@ Node *Parser::parameterType() {
     }
     return root;
 }
+
+Node *Parser::compoundStatements() {
+    auto root = new Node(Node::CompoundStatements);
+    auto isOpenBrace = checkTerminal(current, Token::OPEN_BRACE);
+    if (isOpenBrace.has_value()) {
+        logError("Compound statements require a {", isOpenBrace.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    if (!checkTerminal(current, Token::CLOSE_BRACE).has_value()) {
+        current++;
+        return root;
+    }
+    auto statementsNode = statements();
+    if (statementsNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(statementsNode);
+    }
+    auto isCloseBrace = checkTerminal(current, Token::CLOSE_BRACE);
+    if (isCloseBrace.has_value()) {
+        logError("Compound statements require a }", isCloseBrace.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    return root;
+}
