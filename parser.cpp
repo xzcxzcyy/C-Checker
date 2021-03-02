@@ -361,3 +361,32 @@ Node *Parser::parameterList() {
     }
     return root;
 }
+
+Node *Parser::parameter() {
+    auto root = new Node(Node::Parameter);
+    if (current >= tokens.end()) {
+        logError("Parameter requires a type specifier.", tokens.end() - 1);
+        delete root;
+        return nullptr;
+    }
+    if (!isTypeSpec(current)) {
+        logError("Parameter requires a type specifier.", current);
+        delete root;
+        return nullptr;
+    } else {
+        auto typeSpecNode = new Node(Node::TypeSpec, *current);
+        current++;
+        root->addChild(typeSpecNode);
+    }
+    auto isIdentifier = checkTerminal(current, Token::IDENTIFIER);
+    if (isIdentifier.has_value()) {
+        logError("Parameter requires an identifier.", isIdentifier.value());
+        delete root;
+        return nullptr;
+    } else {
+        auto identifierNode = new Node(Node::Identifier, *current);
+        current++;
+        root->addChild(identifierNode);
+    }
+    return root;
+}
