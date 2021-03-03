@@ -927,3 +927,48 @@ Node *Parser::ifStatement() {
     }
     return root;
 }
+
+Node *Parser::whileStatement() {
+    auto root = new Node(Node::WhileStatement);
+    auto isWhile = checkTerminal(current, Token::WHILE);
+    if (isWhile.has_value()) {
+        logError("Requires while keyword.", *isWhile);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto isOpenParen = checkTerminal(current, Token::OPEN_PAREN);
+    if (isOpenParen.has_value()) {
+        logError("Requires an (.", *isOpenParen);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+
+    auto expressionNode = expression();
+    if (expressionNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(expressionNode);
+    }
+
+    auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
+    if (isCloseParen.has_value()) {
+        logError(") expected.", *isCloseParen);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto statementNode = statement();
+    if (statementNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(statementNode);
+    }
+    return root;
+}
