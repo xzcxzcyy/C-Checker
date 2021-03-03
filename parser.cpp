@@ -834,3 +834,43 @@ Node *Parser::wrappedExpression() {
     }
     return root;
 }
+
+Node *Parser::functionCall() {
+    auto root = new Node(Node::FunctionCall);
+    auto isIdentifier = checkTerminal(current, Token::IDENTIFIER);
+    if (isIdentifier.has_value()) {
+        logError("Function invocation requires a function name.", isIdentifier.value());
+        delete root;
+        return nullptr;
+    } else {
+        auto child1 = new Node(Node::Identifier, *current);
+        current++;
+        root->addChild(child1);
+    }
+    auto isOpenParen = checkTerminal(current, Token::OPEN_PAREN);
+    if (isOpenParen.has_value()) {
+        logError("Function invocation requires an open parenthesis.", isOpenParen.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    if (checkTerminal(current, Token::CLOSE_PAREN).has_value()) {
+        auto child2 = argumentList();
+        if (child2 == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(child2);
+        }
+    }
+    auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
+    if (isCloseParen.has_value()) {
+        logError("Function invocation requires a CLOSE_PAREN.", isCloseParen.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    return root;
+}
