@@ -1133,3 +1133,25 @@ Node *Parser::continueStatement() {
     }
     return root;
 }
+
+Node *Parser::argumentList() {
+    auto root = new Node(Node::ArgumentList);
+    auto expNode = expression();
+    if (expNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(expNode);
+    }
+    if (!checkTerminal(current, Token::COMMA).has_value()) {
+        current++;
+        auto child2 = argumentList();
+        if (child2 == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(child2);
+        }
+    }
+    return root;
+}
