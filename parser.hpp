@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <optional>
+#include <stack>
 #include "token.hpp"
 #include "node.hpp"
 
@@ -51,6 +52,10 @@ private:
 
     Node *expression();
 
+    Node *wrappedExpression();
+
+    Node *functionCall();
+
     Node *ifStatement();
 
     Node *whileStatement();
@@ -76,6 +81,14 @@ private:
     static bool isFirstOfExpression(iterator t);
 
     static bool isFirstOfLocalVarDef(iterator t);
+
+    static int precedence(Node *node);
+
+    static bool isLegalExpressionElement(iterator it);
+
+    static bool isBinaryOperator(iterator it);
+
+    static Node *pop(std::stack<Node *> &stack);
 
 public:
     explicit Parser(std::vector<Token> ts, std::ostream &out) : tokens(std::move(ts)), out(out) {

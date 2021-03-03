@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stack>
 #include <optional>
 #include "parser.hpp"
 #include "node.hpp"
@@ -574,4 +575,208 @@ Node *Parser::localVarDef() {
         root->addChild(varDefNode);
     }
     return root;
+}
+
+Node *Parser::expression() {
+    if (current >= tokens.end() || !isLegalExpressionElement(current)) {
+        logError("Expression expected.", current);
+        return nullptr;
+    }
+    auto root = new Node(Node::Expression);
+    enum Require {
+        rOperator, rOperand
+    };
+    const std::string errRequireOperator = "Requires an operator.";
+    const std::string errRequireOperand = "Requires an operand.";
+    std::stack<Node *> operandStack, operatorStack;
+    Require require = rOperand;
+    while (current < tokens.end() && isLegalExpressionElement(current)) {
+        if (isConstNumber(current)) {
+            if (require == rOperator) {
+                logError(errRequireOperator, current);
+                delete root;
+                return nullptr;
+            }
+            auto operandNode = new Node(Node::ConstNumber, *current);
+            current++;
+            operandStack.push(operandNode);
+            require = rOperator;
+        } else if (current->type == Token::OPEN_PAREN) {
+            if (require == rOperator) {
+                logError(errRequireOperator, current);
+                delete root;
+                return nullptr;
+            }
+            auto wrappedExpNode = wrappedExpression();
+            if (wrappedExpNode == nullptr) {
+                delete root;
+                return nullptr;
+            }
+            operandStack.push(wrappedExpNode);
+            require = rOperator;
+        } else if (current->type == Token::IDENTIFIER) {
+            if (require == rOperator) {
+                logError(errRequireOperator, current);
+                delete root;
+                return nullptr;
+            }
+            if (current + 1 < tokens.end() && (current + 1)->type == Token::OPEN_PAREN) {
+                auto funCallNode = functionCall();
+                if (funCallNode == nullptr) {
+                    delete root;
+                    return nullptr;
+                } else {
+                    operandStack.push(funCallNode);
+                    require = rOperator;
+                }
+            } else {
+                auto varNode = new Node(Node::Identifier, *current);
+                current++;
+                operandStack.push(varNode);
+                require = rOperator;
+            }
+        } else if (isBinaryOperator(current)) {
+            if (require == rOperand) {
+                logError(errRequireOperand, current);
+                delete root;
+                return nullptr;
+            }
+            auto curOpt = new Node(Node::Operator, *current);
+            current++;
+            require = rOperand;
+            if (operatorStack.empty()) {
+                operatorStack.push(curOpt);
+            } else if (precedence(curOpt) <= precedence(operatorStack.top())) {
+                auto opn2 = pop(operandStack);
+                auto opn1 = pop(operandStack);
+                auto optTop = pop(operatorStack);
+                if (opn2 == nullptr || opn1 == nullptr || optTop == nullptr) {
+                    delete root;
+                    return nullptr;
+                }
+                optTop->addChild(opn1);
+                optTop->addChild(opn2);
+                operandStack.push(optTop);
+                operatorStack.push(curOpt);
+            } else if (precedence(curOpt) > precedence(operatorStack.top())) {
+                operatorStack.push(curOpt);
+            }
+        }
+    }
+
+    if (require == rOperand) {
+        delete root;
+        return nullptr;
+    }
+
+    while (!operatorStack.empty()) {
+        auto opt = pop(operatorStack);
+        auto opn2 = pop(operandStack);
+        auto opn1 = pop(operandStack);
+        opt->addChild(opn1);
+        opt->addChild(opn2);
+        operandStack.push(opt);
+    }
+    auto result = pop(operandStack);
+    if (result == nullptr) {
+        delete root;
+        return nullptr;
+    }
+    root->addChild(result);
+    return root;
+}
+
+int Parser::precedence(Node *node) {
+    if (!node->info.has_value()) {
+        throw std::invalid_argument("An illegal node invokes Parser::precedence.");
+    }
+
+    Token::TokenType type = node->info->type;
+    int precedenceCode;
+    switch (type) {
+        case Token::ASSIGN:
+        case Token::PLUS_ASSIGN:
+        case Token::MINUS_ASSIGN:
+        case Token::TIMES_ASSIGN:
+        case Token::DIVIDE_ASSIGN:
+        case Token::MOD_ASSIGN:
+            precedenceCode = 0;
+            break;
+
+        case Token::LOGICAL_OR:
+            precedenceCode = 1;
+            break;
+
+        case Token::LOGICAL_AND:
+            precedenceCode = 2;
+            break;
+
+        case Token::EQUAL:
+        case Token::NOT_EQUAL:
+            precedenceCode = 3;
+            break;
+
+        case Token::LESS:
+        case Token::LEQUAL:
+        case Token::GREATER:
+        case Token::GEQUAL:
+            precedenceCode = 4;
+            break;
+
+        case Token::PLUS:
+        case Token::MINUS:
+            precedenceCode = 5;
+            break;
+
+        case Token::DIVIDE:
+        case Token::TIMES:
+        case Token::MOD:
+            precedenceCode = 6;
+            break;
+
+        default:
+            throw std::invalid_argument("An illegal node invokes Parser::precedence.");
+    }
+    return precedenceCode;
+}
+
+bool Parser::isLegalExpressionElement(iterator it) {
+    auto type = it->type;
+    return type == Token::IDENTIFIER
+           || type == Token::OPEN_PAREN
+           || isConstNumber(it)
+           || isBinaryOperator(it);
+}
+
+bool Parser::isBinaryOperator(Parser::iterator it) {
+    auto type = it->type;
+    return type == Token::ASSIGN
+           || type == Token::PLUS_ASSIGN
+           || type == Token::MINUS_ASSIGN
+           || type == Token::TIMES_ASSIGN
+           || type == Token::DIVIDE_ASSIGN
+           || type == Token::MOD_ASSIGN
+           || type == Token::LOGICAL_OR
+           || type == Token::LOGICAL_AND
+           || type == Token::EQUAL
+           || type == Token::NOT_EQUAL
+           || type == Token::LESS
+           || type == Token::LEQUAL
+           || type == Token::GREATER
+           || type == Token::GEQUAL
+           || type == Token::PLUS
+           || type == Token::MINUS
+           || type == Token::TIMES
+           || type == Token::DIVIDE
+           || type == Token::MOD;
+}
+
+Node *Parser::pop(std::stack<Node *> &stack) {
+    if (stack.empty()) {
+        return nullptr;
+    } else {
+        auto sTop = stack.top();
+        stack.pop();
+        return sTop;
+    }
 }

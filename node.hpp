@@ -37,10 +37,11 @@ public:
         BreakStatement,
         ContinueStatement,
         LocalVarDef,
-        Operand,
         Operator,
         Epsilon,
         Const,
+        WrappedExpression,
+        FunctionCall,
     };
 
     NodeType type;
