@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 #include <string>
+#include <iostream>
 #include "token.hpp"
 
 class Node {
@@ -64,6 +65,13 @@ public:
     }
 
     void addChild(Node *kid);
+
+    void display(int indent) const;
+
+    [[nodiscard]] std::string nodeTypeString() const;
+
+private:
+    static void printIndent(int indent);
 };
 
 #endif
