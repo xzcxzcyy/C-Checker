@@ -972,3 +972,91 @@ Node *Parser::whileStatement() {
     }
     return root;
 }
+
+Node *Parser::forStatement() {
+    auto root = new Node(Node::ForStatement);
+    auto isFor = checkTerminal(current, Token::FOR);
+    if (isFor.has_value()) {
+        logError("Token 'for' expected.", *isFor);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto isOpenParen = checkTerminal(current, Token::OPEN_PAREN);
+    if (isOpenParen.has_value()) {
+        logError("( expected.", *isOpenParen);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    if (current >= tokens.end()) {
+        logError("Missing first part of for statement.", tokens.end() - 1);
+        delete root;
+        return nullptr;
+    } else if (isFirstOfLocalVarDef(current)) {
+        auto localVarDefNode = localVarDef();
+        if (localVarDefNode == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(localVarDefNode);
+        }
+    } else {
+        auto expNode = expression();
+        if (expNode == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(expNode);
+        }
+        auto isSemi = checkTerminal(current, Token::SEMICOL);
+        if (isSemi.has_value()) {
+            logError("; expected in for statement.", *isSemi);
+            delete root;
+            return nullptr;
+        } else {
+            current++;
+        }
+    }
+    auto exp2Node = expression();
+    if (exp2Node == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(exp2Node);
+    }
+    auto isSemi = checkTerminal(current, Token::SEMICOL);
+    if (isSemi.has_value()) {
+        logError("; expected in for statement.", *isSemi);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto exp3Node = expression();
+    if (exp3Node == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(exp3Node);
+    }
+    auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
+    if (isCloseParen.has_value()) {
+        logError(") expected in for statement.", *isCloseParen);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+
+    auto statNode = statement();
+    if (statNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(statNode);
+    }
+    return root;
+}
