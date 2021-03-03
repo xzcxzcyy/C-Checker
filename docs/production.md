@@ -82,7 +82,7 @@ IfStatement -> if ( Expression ) Statement else Statement
 
 WhileStatement -> while ( Expression ) Statement
 
-ForStatement -> for ( LocalVarDef ; Expression ; Expression ) Statement
+ForStatement -> for ( LocalVarDef Expression ; Expression ) Statement
               | for ( Expression ; Expression ; Expression ) Statement
 
 ReturnStatement -> return Expression ;
