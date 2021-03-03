@@ -874,3 +874,56 @@ Node *Parser::functionCall() {
     }
     return root;
 }
+
+Node *Parser::ifStatement() {
+    auto root = new Node(Node::IfStatement);
+    auto isIf = checkTerminal(current, Token::IF);
+    if (isIf.has_value()) {
+        logError("Requires if for an IfStatement.", isIf.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto isOpenParen = checkTerminal(current, Token::OPEN_PAREN);
+    if (isOpenParen.has_value()) {
+        logError("An if statement requires an OPEN_PAREN", isOpenParen.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto child1 = expression();
+    if (child1 == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(child1);
+    }
+    auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
+    if (isCloseParen.has_value()) {
+        logError("Expect )", isCloseParen.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto child2 = statement();
+    if (child2 == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(child2);
+    }
+    if (!checkTerminal(current, Token::ELSE).has_value()) {
+        current++;
+        auto child3 = statement();
+        if (child3 == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(child3);
+        }
+    }
+    return root;
+}
