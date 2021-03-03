@@ -1060,3 +1060,34 @@ Node *Parser::forStatement() {
     }
     return root;
 }
+
+Node *Parser::returnStatement() {
+    auto root = new Node(Node::ReturnStatement);
+    auto isReturn = checkTerminal(current, Token::RETURN);
+    if (isReturn.has_value()) {
+        logError("return expected.", *isReturn);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+
+    if (checkTerminal(current, Token::SEMICOL).has_value()) {
+        auto expNode = expression();
+        if (expNode == nullptr) {
+            delete root;
+            return nullptr;
+        } else {
+            root->addChild(expNode);
+        }
+    }
+    auto isSemi = checkTerminal(current, Token::SEMICOL);
+    if (isSemi.has_value()) {
+        logError("; expected.", *isSemi);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    return root;
+}
