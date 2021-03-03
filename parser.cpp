@@ -1155,3 +1155,7 @@ Node *Parser::argumentList() {
     }
     return root;
 }
+
+Node *Parser::parse() {
+    return program();
+}

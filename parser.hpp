@@ -98,6 +98,8 @@ public:
     explicit Parser(std::vector<Token> ts, std::ostream &out) : tokens(std::move(ts)), out(out) {
         current = tokens.begin();
     }
+
+    Node *parse();
 };
 
 #endif
