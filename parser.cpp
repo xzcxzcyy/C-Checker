@@ -532,6 +532,15 @@ Node *Parser::statement() {
     }
     if (isFirstOfExpression(current)) {
         child = expression();
+        auto isSemicolon = checkTerminal(current, Token::SEMICOL);
+        if (isSemicolon.has_value()) {
+            logError("; expected.", isSemicolon.value());
+            delete root;
+            delete child;
+            return nullptr;
+        } else {
+            current++;
+        }
     } else if (current->type == Token::OPEN_BRACE) {
         child = compoundStatements();
     } else if (current->type == Token::IF) {

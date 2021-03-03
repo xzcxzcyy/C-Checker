@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(cchecker VERSION 0.1.0)
+IF (CMAKE_BUILD_TYPE MATCHES Debug)
+    message("debug mode")
+    add_compile_options(-fno-omit-frame-pointer -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    add_link_options(-fno-omit-frame-pointer -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+ENDIF ()
 
 set(CMAKE_CXX_STANDARD 17)
 
