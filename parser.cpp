@@ -806,3 +806,31 @@ void Parser::clearStack(std::stack<Node *> &stack) {
         delete top;
     }
 }
+
+Node *Parser::wrappedExpression() {
+    auto root = new Node(Node::WrappedExpression);
+    auto isOpenParen = checkTerminal(current, Token::OPEN_PAREN);
+    if (isOpenParen.has_value()) {
+        logError("requires (", isOpenParen.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto expNode = expression();
+    if (expNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(expNode);
+    }
+    auto isCloseParen = checkTerminal(current, Token::CLOSE_PAREN);
+    if (isCloseParen.has_value()) {
+        logError("Parenthesis not matching.", isCloseParen.value());
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    return root;
+}

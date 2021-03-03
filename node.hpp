@@ -42,6 +42,7 @@ public:
         Const,
         WrappedExpression,
         FunctionCall,
+        ArgumentList,
     };
 
     NodeType type;

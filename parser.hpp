@@ -68,6 +68,8 @@ private:
 
     Node *continueStatement();
 
+    Node *argumentList();
+
     void logError(const std::string &reason, iterator pos);
 
     std::optional<iterator> checkTerminal(iterator t, Token::TokenType type);

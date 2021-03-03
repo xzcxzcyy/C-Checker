@@ -90,3 +90,9 @@ ReturnStatement -> return Expression ;
 BreakStatement -> break ;
 
 ContinueStatement -> continue ;
+
+FunctionCall -> identifier ( )
+              | identifier ( ArgumentList )
+
+ArgumentList -> Expression , ArgumentList
+              | Expression
