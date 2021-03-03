@@ -594,6 +594,8 @@ Node *Parser::expression() {
         if (isConstNumber(current)) {
             if (require == rOperator) {
                 logError(errRequireOperator, current);
+                clearStack(operandStack);
+                clearStack(operatorStack);
                 delete root;
                 return nullptr;
             }
@@ -604,11 +606,15 @@ Node *Parser::expression() {
         } else if (current->type == Token::OPEN_PAREN) {
             if (require == rOperator) {
                 logError(errRequireOperator, current);
+                clearStack(operandStack);
+                clearStack(operatorStack);
                 delete root;
                 return nullptr;
             }
             auto wrappedExpNode = wrappedExpression();
             if (wrappedExpNode == nullptr) {
+                clearStack(operandStack);
+                clearStack(operatorStack);
                 delete root;
                 return nullptr;
             }
@@ -617,12 +623,16 @@ Node *Parser::expression() {
         } else if (current->type == Token::IDENTIFIER) {
             if (require == rOperator) {
                 logError(errRequireOperator, current);
+                clearStack(operandStack);
+                clearStack(operatorStack);
                 delete root;
                 return nullptr;
             }
             if (current + 1 < tokens.end() && (current + 1)->type == Token::OPEN_PAREN) {
                 auto funCallNode = functionCall();
                 if (funCallNode == nullptr) {
+                    clearStack(operandStack);
+                    clearStack(operatorStack);
                     delete root;
                     return nullptr;
                 } else {
@@ -638,6 +648,8 @@ Node *Parser::expression() {
         } else if (isBinaryOperator(current)) {
             if (require == rOperand) {
                 logError(errRequireOperand, current);
+                clearStack(operandStack);
+                clearStack(operatorStack);
                 delete root;
                 return nullptr;
             }
@@ -651,6 +663,8 @@ Node *Parser::expression() {
                 auto opn1 = pop(operandStack);
                 auto optTop = pop(operatorStack);
                 if (opn2 == nullptr || opn1 == nullptr || optTop == nullptr) {
+                    clearStack(operandStack);
+                    clearStack(operatorStack);
                     delete root;
                     return nullptr;
                 }
@@ -665,6 +679,8 @@ Node *Parser::expression() {
     }
 
     if (require == rOperand) {
+        clearStack(operandStack);
+        clearStack(operatorStack);
         delete root;
         return nullptr;
     }
@@ -679,6 +695,8 @@ Node *Parser::expression() {
     }
     auto result = pop(operandStack);
     if (result == nullptr) {
+        clearStack(operandStack);
+        clearStack(operatorStack);
         delete root;
         return nullptr;
     }
@@ -778,5 +796,13 @@ Node *Parser::pop(std::stack<Node *> &stack) {
         auto sTop = stack.top();
         stack.pop();
         return sTop;
+    }
+}
+
+void Parser::clearStack(std::stack<Node *> &stack) {
+    while (!stack.empty()) {
+        auto top = stack.top();
+        stack.pop();
+        delete top;
     }
 }

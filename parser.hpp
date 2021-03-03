@@ -90,6 +90,8 @@ private:
 
     static Node *pop(std::stack<Node *> &stack);
 
+    static void clearStack(std::stack<Node *> &stack);
+
 public:
     explicit Parser(std::vector<Token> ts, std::ostream &out) : tokens(std::move(ts)), out(out) {
         current = tokens.begin();
