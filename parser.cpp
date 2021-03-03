@@ -1091,3 +1091,45 @@ Node *Parser::returnStatement() {
     }
     return root;
 }
+
+Node *Parser::breakStatement() {
+    auto root = new Node(Node::BreakStatement);
+    auto isBreak = checkTerminal(current, Token::BREAK);
+    if (isBreak.has_value()) {
+        logError("break expected.", *isBreak);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto isSemi = checkTerminal(current, Token::SEMICOL);
+    if (isSemi.has_value()) {
+        logError("; expected.", *isSemi);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    return root;
+}
+
+Node *Parser::continueStatement() {
+    auto root = new Node(Node::ContinueStatement);
+    auto isContinue = checkTerminal(current, Token::CONTINUE);
+    if (isContinue.has_value()) {
+        logError("continue expected.", *isContinue);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    auto isSemi = checkTerminal(current, Token::SEMICOL);
+    if (isSemi.has_value()) {
+        logError("; expected.", *isSemi);
+        delete root;
+        return nullptr;
+    } else {
+        current++;
+    }
+    return root;
+}
