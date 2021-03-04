@@ -5,7 +5,7 @@
 using namespace std;
 
 int main() {
-    auto lexer = Lexer("test/test2.in");
+    auto lexer = Lexer("test/test.in");
     lexer.analyze();
     lexer.displayTokens(cout, false);
     // lexer.displayTokens(cout, false);

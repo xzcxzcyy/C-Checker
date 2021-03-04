@@ -9,10 +9,15 @@ Node *Parser::program() {
     if (current == tokens.end()) {
         return nullptr;
     }
-    auto programNode = new Node(Node::Program);
+    auto root = new Node(Node::Program);
     auto extDefListNode = extDefList();
-    programNode->addChild(extDefListNode);
-    return programNode;
+    if (extDefListNode == nullptr) {
+        delete root;
+        return nullptr;
+    } else {
+        root->addChild(extDefListNode);
+    }
+    return root;
 }
 
 Node *Parser::extDefList() {
@@ -136,6 +141,10 @@ Node *Parser::varDef() {
         auto typeSpecNode = new Node(Node::TypeSpec, *current);
         root->addChild(typeSpecNode);
         current++;
+    } else {
+        logError("Expecting a type specifier or const.", current);
+        delete root;
+        return nullptr;
     }
     auto varInitSeqNode = varInitSeq();
     if (varInitSeqNode == nullptr) {
