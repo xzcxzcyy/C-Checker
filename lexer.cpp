@@ -1,4 +1,6 @@
+#include <iostream>
 #include <fstream>
+#include <utility>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -8,6 +10,11 @@
 void Lexer::analyze() {
     line = 1;
     auto inputStream = std::ifstream(fileName);
+    if (!inputStream.is_open()) {
+        std::cout << "Cannot open file " << fileName
+                  << std::endl;
+        return;
+    }
     tokens.clear();
     int state = 0;
     char ch;
@@ -88,6 +95,8 @@ void Lexer::analyze() {
                     state = 19;
                 } else if (isEof(ch)) {
                     loopFlag = false;
+                } else if (ch == '#') {
+                    preprocess(inputStream, loopFlag, word, state);
                 } else {
                     std::string errorMsg = "Lexical error: illegal character at line ";
                     errorMsg.append(std::to_string(line));
@@ -454,7 +463,7 @@ void Lexer::analyze() {
                 break;
 
             default:
-                throw "ILLEGAL_LEXER_STATE_EXP";
+                throw std::logic_error("ILLEGAL_STATE_EXCEPTION");
         }
     }
     inputStream.close();
@@ -522,7 +531,7 @@ void Lexer::panic(std::ifstream &inputStream, bool &loopFlag, std::string &word,
 }
 
 Token Lexer::makeToken(std::string name, Token::TokenType type) {
-    return Token(name, type, fileName, line);
+    return Token(std::move(name), type, fileName, line);
 }
 
 void Lexer::displayTokens(std::ostream &out, bool sortThem) {
@@ -589,5 +598,54 @@ void Lexer::displayTokens(std::ostream &out, bool sortThem) {
         out << tokenClassNames[token.type] << "\t" << token.name
             << "\tline " << std::to_string(token.line) << "\t" << token.fileName
             << std::endl;
+    }
+}
+
+void Lexer::preprocess(std::ifstream &masterInput, bool &loopFlag, std::string &word, int &state) {
+    std::string head;
+    masterInput >> head;
+    if (head == "define") {
+        char ch;
+        do {
+            ch = masterInput.get();
+        } while (!isEof(ch) && ch != '\n');
+        masterInput.unget();
+    } else if (head == "include") {
+        char ch;
+        do {
+            ch = masterInput.get();
+        } while (!isEof(ch) && ch != '\"' && ch != '\n');
+        if (isEof(ch) || ch == '\n') {
+            std::string errorMsg = "Preprocess: incomplete include command on line " + std::to_string(line);
+            tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
+            panic(masterInput, loopFlag, word, state);
+            return;
+        }
+        std::string servantFileName;
+        // TODO: read servant filename
+        while ((ch = masterInput.get()) != '\"' && !isEof(ch) && ch != '\n' && ch != '\r') {
+            servantFileName.push_back(ch);
+        }
+        if (ch != '\"') {
+            std::string errorMsg = "Preprocess: invalid include command on line " + std::to_string(line);
+            tokens.push_back(makeToken(errorMsg, Token::ERROR_TOKEN));
+            panic(masterInput, loopFlag, word, state);
+            return;
+        }
+        while ((ch = masterInput.get()) != '\n' && !isEof(ch));
+        masterInput.unget();
+        word.clear();
+        state = 0;
+        auto servantLexer = Lexer(servantFileName);
+        servantLexer.analyze();
+        errorCount += servantLexer.getErrorCount();
+        auto servantTokens = servantLexer.getTokens();
+        for (const auto &token : servantTokens) {
+            tokens.push_back(token);
+        }
+    } else {
+        std::string errMsg = "Invalid preprocess command on line " + std::to_string(line);
+        tokens.push_back(makeToken(errMsg, Token::ERROR_TOKEN));
+        panic(masterInput, loopFlag, word, state);
     }
 }

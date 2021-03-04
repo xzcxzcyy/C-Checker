@@ -11,23 +11,22 @@
 class Lexer {
 private:
     std::string fileName;
-    // std::ifstream inputStream;
     std::vector<Token> tokens;
     std::unordered_map<std::string, Token::TokenType> keywords;
     int errorCount;
     int line = 1;
 
-    bool isUnderscore(char c);
+    static bool isUnderscore(char c);
 
-    bool isDigit(char c);
+    static bool isDigit(char c);
 
-    bool isLetter(char c);
+    static bool isLetter(char c);
 
-    bool isEof(char c);
+    static bool isEof(char c);
 
-    bool isWhiteSpace(char c);
+    static bool isWhiteSpace(char c);
 
-    bool isHexadecimal(char c);
+    static bool isHexadecimal(char c);
 
     void inflateKeywords();
 
@@ -53,6 +52,8 @@ public:
     void analyze();
 
     void displayTokens(std::ostream &out, bool sortThem);
+
+    void preprocess(std::ifstream &masterInput, bool &loopFlag, std::string &word, int &state);
 };
 
 #endif
