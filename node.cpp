@@ -7,17 +7,15 @@ void Node::addChild(Node *kid) {
     children.push_back(kid);
 }
 
-void Node::display(int indent) const {
-    std::string typeString = nodeTypeString();
-    printIndent(indent);
-    std::cout << typeString;
+void Node::display(std::string prefix) const {
+    std::cout << prefix << "-- ";
+    std::cout << nodeTypeString() << "  ";
     if (info.has_value()) {
-        auto extraInfo = info.value();
-        std::cout << " " << extraInfo.name;
+        std::cout << info->name << " ";
     }
     std::cout << std::endl;
-    for (auto child : children) {
-        child->display(indent + 2);
+    for (auto kid : children) {
+        kid->display(prefix + "  |");
     }
 }
 

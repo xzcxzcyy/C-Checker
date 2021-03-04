@@ -5,7 +5,7 @@
 using namespace std;
 
 int main() {
-    auto lexer = Lexer("test/test3.in");
+    auto lexer = Lexer("test/test2.in");
     lexer.analyze();
     lexer.displayTokens(cout, false);
     // lexer.displayTokens(cout, false);
@@ -13,7 +13,7 @@ int main() {
     auto parser = Parser(lexer.getTokens(), cout);
     auto root = parser.parse();
     if (root != nullptr) {
-        root->display(1);
+        root->display("");
     }
     delete root;
     return 0;

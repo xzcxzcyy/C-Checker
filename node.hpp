@@ -66,7 +66,7 @@ public:
 
     void addChild(Node *kid);
 
-    void display(int indent) const;
+    void display(std::string prefix) const;
 
     [[nodiscard]] std::string nodeTypeString() const;
 
