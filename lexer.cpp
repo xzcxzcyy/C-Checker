@@ -622,7 +622,6 @@ void Lexer::preprocess(std::ifstream &masterInput, bool &loopFlag, std::string &
             return;
         }
         std::string servantFileName;
-        // TODO: read servant filename
         while ((ch = masterInput.get()) != '\"' && !isEof(ch) && ch != '\n' && ch != '\r') {
             servantFileName.push_back(ch);
         }
