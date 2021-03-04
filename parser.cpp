@@ -665,27 +665,23 @@ Node *Parser::expression() {
             auto curOpt = new Node(Node::Operator, *current);
             current++;
             require = rOperand;
-            if (operatorStack.empty()) {
-                operatorStack.push(curOpt);
-            } else if (precedence(curOpt) <= precedence(operatorStack.top())) {
-                while (!operatorStack.empty() && precedence(curOpt) <= precedence(operatorStack.top())) {
-                    auto opn2 = pop(operandStack);
-                    auto opn1 = pop(operandStack);
-                    auto optTop = pop(operatorStack);
-                    if (opn2 == nullptr || opn1 == nullptr || optTop == nullptr) {
-                        clearStack(operandStack);
-                        clearStack(operatorStack);
-                        delete root;
-                        return nullptr;
-                    }
-                    optTop->addChild(opn1);
-                    optTop->addChild(opn2);
-                    operandStack.push(optTop);
+
+            while (!operatorStack.empty() && precedence(curOpt) <= precedence(operatorStack.top())) {
+                auto opn2 = pop(operandStack);
+                auto opn1 = pop(operandStack);
+                auto optTop = pop(operatorStack);
+                if (opn2 == nullptr || opn1 == nullptr || optTop == nullptr) {
+                    clearStack(operandStack);
+                    clearStack(operatorStack);
+                    delete root;
+                    return nullptr;
                 }
-                operatorStack.push(curOpt);
-            } else if (precedence(curOpt) > precedence(operatorStack.top())) {
-                operatorStack.push(curOpt);
+                optTop->addChild(opn1);
+                optTop->addChild(opn2);
+                operandStack.push(optTop);
             }
+            operatorStack.push(curOpt);
+
         }
     }
 
