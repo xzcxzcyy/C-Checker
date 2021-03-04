@@ -1,6 +1,8 @@
 #ifndef TOKEN_HPP
 #define TOKEN_HPP
+
 #include <string>
+#include <utility>
 
 class Token {
 public:
@@ -62,13 +64,13 @@ public:
     int line;
 
     Token(std::string name, TokenType type, std::string fileName, int line) {
-        this->name = name;
+        this->name = std::move(name);
         this->type = type;
-        this->fileName = fileName;
+        this->fileName = std::move(fileName);
         this->line = line;
     }
 
-    bool operator<(const Token &another) {
+    bool operator<(const Token &another) const {
         if (this->type < another.type) {
             return true;
         }
