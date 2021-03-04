@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <utility>
 #include <vector>
 #include <unordered_map>
 #include "token.hpp"
@@ -35,8 +36,7 @@ private:
     Token makeToken(std::string name, Token::TokenType type);
 
 public:
-    explicit Lexer(std::string fileName) {
-        this->fileName = fileName;
+    explicit Lexer(std::string fileName) : fileName(std::move(fileName)) {
         tokens.clear();
         inflateKeywords();
         errorCount = 0;
