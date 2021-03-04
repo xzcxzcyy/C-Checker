@@ -440,6 +440,17 @@ void Lexer::analyze() {
                     tokens.push_back(makeToken(word, Token::DIVIDE_ASSIGN));
                     word.clear();
                     state = 0;
+                } else if (ch == '/') {
+                    word.push_back(ch);
+                    while ((ch = inputStream.get()) != '\n' && !isEof(ch)) {
+                        if (ch != '\r') {
+                            word.push_back(ch);
+                        }
+                    }
+                    inputStream.unget();
+                    tokens.push_back(makeToken(word, Token::COMMENTS));
+                    word.clear();
+                    state = 0;
                 } else {
                     inputStream.unget();
                     tokens.push_back(makeToken(word, Token::DIVIDE));

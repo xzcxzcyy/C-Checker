@@ -74,6 +74,8 @@ private:
 
     std::optional<iterator> checkTerminal(iterator t, Token::TokenType type);
 
+    void consumeComment(Node *&root, int pos);
+
     static bool isTypeSpec(iterator t);
 
     static bool isFunTypeSpec(iterator t);

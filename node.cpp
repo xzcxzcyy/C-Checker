@@ -7,11 +7,14 @@ void Node::addChild(Node *kid) {
     children.push_back(kid);
 }
 
-void Node::display(std::string prefix) const {
+void Node::display(const std::string& prefix) const {
     std::cout << prefix << "-- ";
     std::cout << nodeTypeString() << "  ";
     if (info.has_value()) {
         std::cout << info->name << " ";
+    }
+    for (const auto &c : comments) {
+        std::cout << std::get<0>(c).name;
     }
     std::cout << std::endl;
     for (auto kid : children) {
@@ -129,4 +132,8 @@ void Node::printIndent(int indent) {
     for (int i = 0; i < indent; i++) {
         std::cout << ' ';
     }
+}
+
+void Node::addComment(const std::tuple<Token, int>& comment) {
+    comments.push_back(comment);
 }

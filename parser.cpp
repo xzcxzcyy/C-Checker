@@ -46,6 +46,7 @@ Node *Parser::extDef() {
         return nullptr;
     }
     auto root = new Node(Node::ExtDef);
+    consumeComment(root, 0);
     if (isFunTypeSpec(current)
         && (current + 1)->type == Token::IDENTIFIER
         && (current + 2)->type == Token::OPEN_PAREN) {
@@ -55,6 +56,7 @@ Node *Parser::extDef() {
             return nullptr;
         }
         root->addChild(funDefNode);
+        consumeComment(root, 1);
         return root;
     } else {
         auto extVarDefNode = extVarDef();
@@ -63,6 +65,7 @@ Node *Parser::extDef() {
             return nullptr;
         }
         root->addChild(extVarDefNode);
+        consumeComment(root, 1);
         return root;
     }
 }
@@ -533,6 +536,7 @@ bool Parser::isFirstOfLocalVarDef(Parser::iterator t) {
 
 Node *Parser::statement() {
     auto root = new Node(Node::Statement);
+    consumeComment(root, 0);
     Node *child = nullptr;
     if (current >= tokens.end()) {
         logError("A statement is expected.", tokens.end() - 1);
@@ -568,6 +572,7 @@ Node *Parser::statement() {
         child = localVarDef();
     } else if (current->type == Token::SEMICOL) {
         current++;
+        consumeComment(root, 1);
         return root;
     } else {
         logError("Illegal statement!", current);
@@ -580,6 +585,7 @@ Node *Parser::statement() {
     } else {
         root->addChild(child);
     }
+    consumeComment(root, 1);
     return root;
 }
 
@@ -1174,4 +1180,11 @@ Node *Parser::argumentList() {
 
 Node *Parser::parse() {
     return program();
+}
+
+void Parser::consumeComment(Node *&root, int pos) {
+    while (current < tokens.end() && current->type == Token::COMMENTS) {
+        root->addComment(std::make_tuple(*current, pos));
+        current++;
+    }
 }

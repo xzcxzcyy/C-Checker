@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include <optional>
+#include <tuple>
 #include <string>
 #include <iostream>
 #include "token.hpp"
@@ -49,6 +50,7 @@ public:
     NodeType type;
     std::optional<Token> info;
     std::vector<Node *> children;
+    std::vector<std::tuple<Token, int>> comments;
 
     explicit Node(NodeType type) : type(type), info({}) {
         children.clear();
@@ -66,7 +68,9 @@ public:
 
     void addChild(Node *kid);
 
-    void display(std::string prefix) const;
+    void addComment(const std::tuple<Token, int>& c);
+
+    void display(const std::string& prefix) const;
 
     [[nodiscard]] std::string nodeTypeString() const;
 
