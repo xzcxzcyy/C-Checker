@@ -8,8 +8,6 @@ ENDIF ()
 
 set(CMAKE_CXX_STANDARD 17)
 
-include(CTest)
-enable_testing()
 
 add_executable(cchecker main.cpp lexer.cpp lexer.hpp token.hpp parser.hpp parser.cpp node.hpp node.cpp)
 add_executable(lexer main.cpp lexer.cpp lexer.hpp token.hpp)
