@@ -74,6 +74,9 @@ public:
 
     [[nodiscard]] std::string nodeTypeString() const;
 
+private:
+    static void printComments(const std::string &comments);
+
 };
 
 #endif

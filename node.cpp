@@ -14,7 +14,7 @@ void Node::display(const std::string& prefix) const {
         std::cout << info->name << " ";
     }
     for (const auto &c : comments) {
-        std::cout << std::get<0>(c).name;
+        printComments(std::get<0>(c).name);
     }
     std::cout << std::endl;
     for (auto kid : children) {
@@ -130,4 +130,14 @@ std::string Node::nodeTypeString() const {
 
 void Node::addComment(const std::tuple<Token, int>& comment) {
     comments.push_back(comment);
+}
+
+void Node::printComments(const std::string &comments) {
+    for (auto c : comments) {
+        if (c == '\r' || c == '\n') {
+            c = ' ';
+        }
+        std::cout << c;
+    }
+    std::cout << "  ";
 }
