@@ -74,8 +74,6 @@ public:
 
     [[nodiscard]] std::string nodeTypeString() const;
 
-private:
-    static void printIndent(int indent);
 };
 
 #endif

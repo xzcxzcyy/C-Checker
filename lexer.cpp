@@ -451,6 +451,9 @@ void Lexer::analyze() {
                     tokens.push_back(makeToken(word, Token::COMMENTS));
                     word.clear();
                     state = 0;
+                } else if (ch == '*') {
+                    word.push_back(ch);
+                    state = 25;
                 } else {
                     inputStream.unget();
                     tokens.push_back(makeToken(word, Token::DIVIDE));
@@ -470,6 +473,40 @@ void Lexer::analyze() {
                     tokens.push_back(makeToken(word, Token::MOD));
                     word.clear();
                     state = 0;
+                }
+                break;
+
+            case 25:
+                if (ch == '*') {
+                    word.push_back(ch);
+                    state = 26;
+                } else if (ch == EOF) {
+                    tokens.push_back(makeToken(word, Token::COMMENTS));
+                    word.clear();
+                    state = 0;
+                    loopFlag = false;
+                } else {
+                    if (ch == '\n') {
+                        line++;
+                    }
+                    word.push_back(ch);
+                }
+                break;
+
+            case 26:
+                if (ch == '/') {
+                    word.push_back(ch);
+                    tokens.push_back(makeToken(word, Token::COMMENTS));
+                    word.clear();
+                    state = 0;
+                } else if (ch == EOF) {
+                    tokens.push_back(makeToken(word, Token::COMMENTS));
+                    word.clear();
+                    state = 0;
+                    loopFlag = false;
+                } else {
+                    word.push_back(ch);
+                    state = 25;
                 }
                 break;
 

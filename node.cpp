@@ -128,12 +128,6 @@ std::string Node::nodeTypeString() const {
     return name;
 }
 
-void Node::printIndent(int indent) {
-    for (int i = 0; i < indent; i++) {
-        std::cout << ' ';
-    }
-}
-
 void Node::addComment(const std::tuple<Token, int>& comment) {
     comments.push_back(comment);
 }
