@@ -68,9 +68,9 @@ public:
 
     void addChild(Node *kid);
 
-    void addComment(const std::tuple<Token, int>& c);
+    void addComment(const std::tuple<Token, int> &c);
 
-    void display(const std::string& prefix) const;
+    void display(const std::string &prefix) const;
 
     [[nodiscard]] std::string nodeTypeString() const;
 
