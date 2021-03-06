@@ -17,6 +17,8 @@ private:
 
     void printIndent(int indent);
 
+    void handleExpression(Node *root);
+
     void printComment(int indent, const std::string &commentString);
 
 public:

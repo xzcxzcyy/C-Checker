@@ -6,14 +6,16 @@
 
 void Serializer::serialize(Node *root, int indent) {
     switch (root->type) {
-        case Node::Program:
+        case Node::Program: {
             serialize(root->children[0], indent);
             break;
-        case Node::ExtDefList:
+        }
+        case Node::ExtDefList: {
             for (auto kid : root->children) {
                 serialize(kid, indent);
             }
             break;
+        }
         case Node::ExtDef: {
             auto comment = root->comments.begin();
             for (; comment != root->comments.end(); comment++) {
@@ -26,41 +28,124 @@ void Serializer::serialize(Node *root, int indent) {
             serialize(root->children[0], indent);
             break;
         }
-        case Node::ExtVarDef:
+        case Node::ExtVarDef: {
             serialize(root->children[0], indent);
+            out << std::endl;
             break;
-        case Node::VarDef:
+        }
+        case Node::VarDef: {
+            printIndent(indent);
+            for (auto child : root->children) {
+                if (child->type == Node::TypeSpec) {
+                    out << child->info->name << " ";
+                } else if (child->type == Node::Const) {
+                    out << "const ";
+                } else if (child->type == Node::VarInitSeq) {
+                    serialize(child, 0);
+                    out << ";";
+                } else {
+                    throw std::logic_error("illegal type in serializer");
+                }
+            }
             break;
-        case Node::TypeSpec:
+        }
+        case Node::VarInitSeq: {
+            for (auto child : root->children) {
+                if (child->type == Node::VarInitSeq) {
+                    out << ", ";
+                }
+                serialize(child, 0);
+            }
             break;
-        case Node::VarInitSeq:
+        }
+        case Node::VarInit: {
+            out << root->children[0]->info->name;
+            if (root->children.size() == 2) {
+                if (root->children[1]->type == Node::Expression) {
+                    out << " = ";
+                    serialize(root->children[1], 0);
+                } else if (root->children[1]->type == Node::ConstNumber) {
+                    out << "[" << root->children[1]->info->name << "]";
+                }
+            }
             break;
-        case Node::VarInit:
+        }
+        case Node::Expression: {
+            handleExpression(root);
             break;
-        case Node::Identifier:
+        }
+        case Node::FunDef: {
+            auto child = root->children.begin();
+            printIndent(indent);
+            out << (*child)->info->name;
+            child++;
+            out << " " << (*child)->info->name
+                << "(";
+            child++;
+            if (child == root->children.end()) {
+                out << ");";
+            } else if ((*child)->type == Node::ParameterList) {
+                serialize(*child, 0);
+                child++;
+                out << ") ";
+                serialize(*child, indent);
+            } else if ((*child)->type == Node::ParameterTypeList) {
+                serialize(*child, 0);
+                out << ");\n";
+            } else if ((*child)->type == Node::CompoundStatements) {
+                out << ") ";
+                serialize(*child, indent);
+            }
             break;
-        case Node::Expression:
+        }
+        case Node::ParameterList: {
+            serialize(root->children[0], 0);
+            if (root->children.size() == 2) {
+                out << ", ";
+                serialize(root->children[1], 0);
+            }
             break;
-        case Node::ConstNumber:
+        }
+        case Node::CompoundStatements: {
+            out << "{\n";
+            if (root->children.size() == 1) {
+                serialize(root->children[0], indent + 4);
+            }
+            printIndent(indent);
+            out << "}";
             break;
-        case Node::FunDef:
+        }
+        case Node::ParameterTypeList: {
+            serialize(root->children[0], 0);
+            if (root->children.size() == 2) {
+                out << ", ";
+                serialize(root->children[1], 0);
+            }
             break;
-        case Node::FunTypeSpec:
+        }
+        case Node::Parameter: {
+            out << root->children[0]->info->name << " "
+                << root->children[1]->info->name;
             break;
-        case Node::ParameterList:
+        }
+        case Node::ParameterType: {
+            out << root->children[0]->info->name;
+            if (root->children.size() == 2) {
+                out << " " << root->children[1]->info->name;
+            }
             break;
-        case Node::CompoundStatements:
+        }
+        case Node::Statements: {
+            serialize(root->children[0], indent);
+            if (root->children.size() == 2) {
+                serialize(root->children[1], indent);
+            }
             break;
-        case Node::ParameterTypeList:
+        }
+        case Node::Statement: {
+
             break;
-        case Node::Parameter:
-            break;
-        case Node::ParameterType:
-            break;
-        case Node::Statements:
-            break;
-        case Node::Statement:
-            break;
+        }
         case Node::IfStatement:
             break;
         case Node::WhileStatement:
@@ -97,5 +182,22 @@ void Serializer::perform(Node *root) {
 void Serializer::printIndent(int indent) {
     for (int i = 0; i < indent; i++) {
         out << " ";
+    }
+}
+
+void Serializer::handleExpression(Node *root) {
+    if (root->type == Node::Expression) {
+        handleExpression(root->children[0]);
+    } else if (root->type == Node::WrappedExpression) {
+        out << "(";
+        handleExpression(root->children[0]);
+        out << ")";
+    } else if (root->type == Node::Operator) {
+        handleExpression(root->children[0]);
+        out << " " << root->info->name << " ";
+        handleExpression(root->children[1]);
+    } else if (root->type == Node::ConstNumber
+               || root->type == Node::Identifier) {
+        out << root->info->name;
     }
 }
