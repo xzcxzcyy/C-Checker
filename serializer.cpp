@@ -26,6 +26,9 @@ void Serializer::serialize(Node *root, int indent) {
                 }
             }
             serialize(root->children[0], indent);
+            for (; comment != root->comments.end(); comment++) {
+                printComment(indent, std::get<0>(*comment).name);
+            }
             break;
         }
         case Node::ExtVarDef: {
