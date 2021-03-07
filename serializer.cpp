@@ -91,9 +91,9 @@ void Serializer::serialize(Node *root, int indent) {
                 serialize(*child, indent);
             } else if ((*child)->type == Node::ParameterTypeList) {
                 serialize(*child, 0);
-                out << ");\n";
+                out << ");" << std::endl;
             } else if ((*child)->type == Node::CompoundStatements) {
-                out << ") ";
+                out << ")" << std::endl;
                 serialize(*child, indent);
             }
             break;
@@ -107,12 +107,13 @@ void Serializer::serialize(Node *root, int indent) {
             break;
         }
         case Node::CompoundStatements: {
-            out << "{\n";
+            printIndent(indent);
+            out << "{" << std::endl;
             if (root->children.size() == 1) {
                 serialize(root->children[0], indent + 4);
             }
             printIndent(indent);
-            out << "}";
+            out << "}" << std::endl;
             break;
         }
         case Node::ParameterTypeList: {
@@ -154,11 +155,14 @@ void Serializer::serialize(Node *root, int indent) {
             }
             if (root->children.empty()) {
                 printIndent(indent);
-                out << ";\n";
+                out << ";" << std::endl;
             } else if (root->children[0]->type == Node::Expression) {
                 printIndent(indent);
                 serialize(root->children[0], 0);
-                out << ";\n";
+                out << ";" << std::endl;
+            } else if (root->children[0]->type == Node::LocalVarDef) {
+                serialize(root->children[0], indent);
+                out << std::endl;
             } else {
                 serialize(root->children[0], indent);
             }
@@ -175,27 +179,20 @@ void Serializer::serialize(Node *root, int indent) {
             bool thenBodyCompound = !root->children[1]->children.empty() &&
                                     root->children[1]->children[0]->type == Node::CompoundStatements;
             if (thenBodyCompound) {
-                out << " ";
+                out << std::endl;
                 serialize(root->children[1], indent);
             } else {
                 out << std::endl;
                 serialize(root->children[1], indent + 4);
             }
             if (root->children.size() == 3) {
-                if (!thenBodyCompound) {
-                    out << std::endl;
-                    printIndent(indent);
-                    out << "else";
-                } else {
-                    out << " else";
-                }
+                printIndent(indent);
+                out << "else" << std::endl;
                 bool elseBodyCompound = !root->children[2]->children.empty() &&
                                         root->children[2]->children[0]->type == Node::CompoundStatements;
                 if (elseBodyCompound) {
-                    out << " ";
                     serialize(root->children[2], indent);
                 } else {
-                    out << std::endl;
                     serialize(root->children[2], indent + 4);
                 }
             }
@@ -208,11 +205,10 @@ void Serializer::serialize(Node *root, int indent) {
             out << ")";
             bool whileBodyCompound = !root->children[1]->children.empty() &&
                                      root->children[1]->children[0]->type == Node::CompoundStatements;
+            out << std::endl;
             if (whileBodyCompound) {
-                out << " ";
                 serialize(root->children[1], indent);
             } else {
-                out << std::endl;
                 serialize(root->children[1], indent + 4);
             }
             break;
@@ -231,11 +227,10 @@ void Serializer::serialize(Node *root, int indent) {
             out << ")";
             bool loopBodyCompound = !root->children[3]->children.empty() &&
                                     root->children[3]->children[0]->type == Node::CompoundStatements;
+            out << std::endl;
             if (loopBodyCompound) {
-                out << " ";
                 serialize(root->children[3], indent);
             } else {
-                out << std::endl;
                 serialize(root->children[3], indent + 4);
             }
             break;
@@ -247,17 +242,17 @@ void Serializer::serialize(Node *root, int indent) {
                 out << " ";
                 serialize(root->children[0], 0);
             }
-            out << ";";
+            out << ";" << std::endl;
             break;
         }
         case Node::BreakStatement: {
             printIndent(indent);
-            out << "break;";
+            out << "break;" << std::endl;
             break;
         }
         case Node::ContinueStatement: {
             printIndent(indent);
-            out << "continue;";
+            out << "continue;" << std::endl;
             break;
         }
         case Node::LocalVarDef: {
