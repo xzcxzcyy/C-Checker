@@ -143,33 +143,145 @@ void Serializer::serialize(Node *root, int indent) {
             break;
         }
         case Node::Statement: {
-
+            auto cit = root->comments.begin();
+            for (; cit != root->comments.end(); cit++) {
+                int pos = std::get<1>(*cit);
+                if (pos == 0) {
+                    printComment(indent, std::get<0>(*cit).name);
+                } else {
+                    break;
+                }
+            }
+            if (root->children.empty()) {
+                printIndent(indent);
+                out << ";\n";
+            } else if (root->children[0]->type == Node::Expression) {
+                printIndent(indent);
+                serialize(root->children[0], 0);
+                out << ";\n";
+            } else {
+                serialize(root->children[0], indent);
+                out << std::endl;
+            }
+            for (; cit != root->comments.end(); cit++) {
+                printComment(indent, std::get<0>(*cit).name);
+            }
             break;
         }
-        case Node::IfStatement:
+        case Node::IfStatement: {
+            printIndent(indent);
+            out << "if" << " (";
+            serialize(root->children[0], 0);
+            out << ")";
+            bool thenBodyCompound = !root->children[1]->children.empty() &&
+                                    root->children[1]->children[0]->type == Node::CompoundStatements;
+            if (thenBodyCompound) {
+                out << " ";
+                serialize(root->children[1], indent);
+            } else {
+                out << std::endl;
+                serialize(root->children[1], indent + 4);
+            }
+            if (root->children.size() == 3) {
+                if (!thenBodyCompound) {
+                    out << std::endl;
+                    printIndent(indent);
+                    out << "else";
+                } else {
+                    out << " else";
+                }
+                bool elseBodyCompound = !root->children[2]->children.empty() &&
+                                        root->children[2]->children[0]->type == Node::CompoundStatements;
+                if (elseBodyCompound) {
+                    out << " ";
+                    serialize(root->children[2], indent);
+                } else {
+                    out << std::endl;
+                    serialize(root->children[2], indent + 4);
+                }
+            }
             break;
-        case Node::WhileStatement:
+        }
+        case Node::WhileStatement: {
+            printIndent(indent);
+            out << "while (";
+            serialize(root->children[0], 0);
+            out << ")";
+            bool whileBodyCompound = !root->children[1]->children.empty() &&
+                                     root->children[1]->children[0]->type == Node::CompoundStatements;
+            if (whileBodyCompound) {
+                out << " ";
+                serialize(root->children[1], indent);
+            } else {
+                out << std::endl;
+                serialize(root->children[1], indent + 4);
+            }
             break;
-        case Node::ForStatement:
+        }
+        case Node::ForStatement: {
+            printIndent(indent);
+            out << "for (";
+            serialize(root->children[0], 0);
+            if (root->children[0]->type == Node::Expression) {
+                out << ";";
+            }
+            out << " ";
+            serialize(root->children[1], 0);
+            out << "; ";
+            serialize(root->children[2], 0);
+            out << ")";
+            bool loopBodyCompound = !root->children[3]->children.empty() &&
+                                    root->children[3]->children[0]->type == Node::CompoundStatements;
+            if (loopBodyCompound) {
+                out << " ";
+                serialize(root->children[3], indent);
+            } else {
+                out << std::endl;
+                serialize(root->children[3], indent + 4);
+            }
             break;
-        case Node::ReturnStatement:
+        }
+        case Node::ReturnStatement: {
+            printIndent(indent);
+            out << "return";
+            if (!root->children.empty()) {
+                out << " ";
+                serialize(root->children[0], 0);
+            }
+            out << ";";
             break;
-        case Node::BreakStatement:
+        }
+        case Node::BreakStatement: {
+            printIndent(indent);
+            out << "break;";
             break;
-        case Node::ContinueStatement:
+        }
+        case Node::ContinueStatement: {
+            printIndent(indent);
+            out << "continue;";
             break;
-        case Node::LocalVarDef:
+        }
+        case Node::LocalVarDef: {
+            serialize(root->children[0], indent);
             break;
-        case Node::Operator:
+        }
+        case Node::FunctionCall: {
+            out << root->children[0]->info->name
+                << "(";
+            if (root->children.size() == 2) {
+                serialize(root->children[1], 0);
+            }
+            out << ")";
             break;
-        case Node::Const:
+        }
+        case Node::ArgumentList: {
+            serialize(root->children[0], 0);
+            if (root->children.size() == 2) {
+                out << ", ";
+                serialize(root->children[1], 0);
+            }
             break;
-        case Node::WrappedExpression:
-            break;
-        case Node::FunctionCall:
-            break;
-        case Node::ArgumentList:
-            break;
+        }
         default:
             throw std::logic_error("Got unhandled node type when serializing.");
     }
@@ -199,5 +311,13 @@ void Serializer::handleExpression(Node *root) {
     } else if (root->type == Node::ConstNumber
                || root->type == Node::Identifier) {
         out << root->info->name;
+    } else if (root->type == Node::FunctionCall) {
+        serialize(root, 0);
     }
+}
+
+void Serializer::printComment(int indent, const std::string &commentString) {
+    printIndent(indent);
+    out << commentString
+        << std::endl;
 }

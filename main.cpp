@@ -3,6 +3,7 @@
 #include <vector>
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "serializer.hpp"
 
 using namespace std;
 
@@ -38,6 +39,7 @@ int main(int argc, char **argv) {
     if (tree == nullptr) {
         return 0;
     }
+    auto serializer = Serializer(cout);
 
     if (argc == 3 && op == "-l") {
         lexer.displayTokens(cout, true);
@@ -48,7 +50,7 @@ int main(int argc, char **argv) {
         delete tree;
         return 0;
     } else if (argc == 4 && op == "-f") {
-        // TODO: serialize AST
+        serializer.perform(tree);
         delete tree;
         return 0;
     } else {
