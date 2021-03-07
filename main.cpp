@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include "lexer.hpp"
@@ -39,7 +40,6 @@ int main(int argc, char **argv) {
     if (tree == nullptr) {
         return 0;
     }
-    auto serializer = Serializer(cout);
 
     if (argc == 3 && op == "-l") {
         lexer.displayTokens(cout, true);
@@ -50,6 +50,8 @@ int main(int argc, char **argv) {
         delete tree;
         return 0;
     } else if (argc == 4 && op == "-f") {
+        auto fout = ofstream(argv[3]);
+        auto serializer = Serializer(fout);
         serializer.perform(tree);
         delete tree;
         return 0;
