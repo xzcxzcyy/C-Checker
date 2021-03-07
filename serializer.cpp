@@ -161,7 +161,6 @@ void Serializer::serialize(Node *root, int indent) {
                 out << ";\n";
             } else {
                 serialize(root->children[0], indent);
-                out << std::endl;
             }
             for (; cit != root->comments.end(); cit++) {
                 printComment(indent, std::get<0>(*cit).name);
