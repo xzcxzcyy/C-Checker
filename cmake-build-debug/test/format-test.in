@@ -1,0 +1,39 @@
+char func2(int p1, long p);
+void func1(int p)
+{
+    p=p*2;
+}
+// function main
+int main()
+{
+    const long a=0x1L,b;
+    /* internal test comment */
+    (a+b)*c%a;
+    if(a==0)
+        if(b==0)
+        {
+            a=0;
+        }
+        else
+        {
+            a=1;
+        }
+    else
+        a = 2;
+    while(a=0)
+    {
+        for(int c=0;c<10;c=c+1)
+        {
+            break;
+        }
+        continue;
+    }
+    while (a < 10) a = a + 1;
+    int a = (b + c) * d / e <= f * declare() * func2(a+b, c+d);
+    int array[100];
+    int somewhat=a+b-0x35*2/3%678;
+    ab >= c && def < g || ccc<=d || cc>d || a!=bb;
+    return 0;
+}
+int a=10,b;
+char declare();

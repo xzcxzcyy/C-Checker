@@ -1,0 +1,5 @@
+float fun()
+{
+    print('h');
+    return 0.;
+}
