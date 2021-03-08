@@ -643,9 +643,16 @@ void Lexer::displayTokens(std::ostream &out, bool sortThem) {
         if (token.type == Token::WHITESPACE) {
             continue;
         }
-        out << tokenClassNames[token.type] << "\t" << token.name
-            << "\tline " << std::to_string(token.line) << "\t" << token.fileName
-            << std::endl;
+        out << "line " << std::to_string(token.line) << "\t" << token.fileName << "\t"
+            << tokenClassNames[token.type] << "\t";
+        for (auto ch : token.name) {
+            if (ch == '\n' || ch == '\r') {
+                out << " ";
+            } else {
+                out << ch;
+            }
+        }
+        out << std::endl;
     }
 }
 

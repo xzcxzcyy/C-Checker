@@ -86,11 +86,12 @@ void Serializer::serialize(Node *root, int indent) {
                 << "(";
             child++;
             if (child == root->children.end()) {
-                out << ");";
+                out << ");" << std::endl;
             } else if ((*child)->type == Node::ParameterList) {
                 serialize(*child, 0);
                 child++;
-                out << ") ";
+                out << ")";
+                out << std::endl;
                 serialize(*child, indent);
             } else if ((*child)->type == Node::ParameterTypeList) {
                 serialize(*child, 0);
